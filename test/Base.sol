@@ -32,7 +32,7 @@ abstract contract Base_Test_ is Test {
     address public dave;
     address public eve;
     address public frank;
-    
+
     // --- Governance ---
     address public deployer;
     address public governor;
