@@ -1,6 +1,31 @@
 [profile.default]
 src = "src"
 out = "out"
-libs = ["lib"]
+test = 'test'
+libs = ["dependencies"]
+auto_detect_remappings = false
+verbosity = 3
+show_progress = true
+ignored_warnings_from = [
+    "dependencies/origin-dollar-1/contracts/contracts/proxies/",
+]
+
+[invariant]
+runs = 256
+depth = 500
+fail_on_revert = true
+
+[dependencies]
+forge-std = "1.9.4"
+origin-dollar = { version = "1", git = "https://github.com/OriginProtocol/origin-dollar.git", rev = "dc7970116395447ae2b7f59be9bd57d060bad18a" }
+"@openzeppelin-contracts" = "4.2"
+
+[soldeer]
+recursive_deps = false
+remappings_version = false
+remappings_generate = false
+remappings_regenerate = false
+remappings_prefix = ""
+remappings_location = "txt"
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
