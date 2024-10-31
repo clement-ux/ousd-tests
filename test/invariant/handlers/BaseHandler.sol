@@ -79,6 +79,10 @@ abstract contract BaseHandler is StdUtils, StdCheats {
         return uint256(keccak256(abi.encodePacked(seed, salt)));
     }
 
+    function _randomize(uint256 seed) internal returns (uint256) {
+        return _randomize(seed, vm.toString(vm.randomUint()));
+    }
+
     /// @notice Return the minimum between two uint256.
     function min(uint256 a, uint256 b) internal pure returns (uint256) {
         return a < b ? a : b;
