@@ -38,9 +38,10 @@ contract Invariant_Basic_Test_ is Invariant_Base_Test_ {
         oethHandler = new OETHHandler(address(oeth), holders, vault, MAX_CREDIT_MINTABLE, RESOLUTION_INCREASE);
 
         // --- Set Selectors Weight ---
-        oethHandler.setSelectorWeight(oethHandler.mint.selector, 4_000);
-        oethHandler.setSelectorWeight(oethHandler.burn.selector, 3_000);
+        oethHandler.setSelectorWeight(oethHandler.mint.selector, 3_000);
+        oethHandler.setSelectorWeight(oethHandler.burn.selector, 2_000);
         oethHandler.setSelectorWeight(oethHandler.transfer.selector, 3_000);
+        oethHandler.setSelectorWeight(oethHandler.rebaseOpt.selector, 2_000);
 
         // --- Set Handlers Weight ---
         address[] memory targetContracts = new address[](1);

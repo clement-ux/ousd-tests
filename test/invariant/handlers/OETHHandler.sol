@@ -177,13 +177,82 @@ contract OETHHandler is BaseHandler {
         console.log("OETHHandler.transfer(%18e), %s -> %s", amountToTransfer, names[user], names[receiver]);
     }
 
+    function rebaseOpt(uint256 _seed) external {
+        numberOfCalls["oeth.rebase"]++;
+
+        bool success;
+        if ((_seed % 2) == 0) {
+            success = _rebaseOptIn(_seed);
+            if (!success) {
+                success = _rebaseOptOut(_seed);
+                require(success, "OETHHandler: RebaseOptIn/Out failed");
+            }
+        } else {
+            success = _rebaseOptOut(_seed);
+            if (!success) {
+                success = _rebaseOptIn(_seed);
+                require(success, "OETHHandler: RebaseOptOut/In failed");
+            }
+        }
+    }
+
+    function _rebaseOptIn(uint256 _seed) internal returns (bool) {
+        address user;
+        uint256 len = holders.length;
+        uint256 initial = _seed % len;
+        for (uint256 i = initial; i < initial + len; i++) {
+            if (isNonRebasingAccount(holders[i % len])) {
+                user = holders[i % len];
+                break;
+            }
+        }
+
+        // If there is no user that can rebaseOptIn, then return false
+        if (user == address(0)) return false;
+
+        // RebaseOptIn
+        vm.prank(user);
+        oeth.rebaseOptIn();
+
+        console.log("OETHHandler.rebaseOptIn(), %s", names[user]);
+
+        return true;
+    }
+
+    function _rebaseOptOut(uint256 _seed) internal returns (bool) {
+        address user;
+        uint256 len = holders.length;
+        uint256 initial = _seed % len;
+        for (uint256 i = initial; i < initial + len; i++) {
+            if (!isNonRebasingAccount(holders[i % len])) {
+                user = holders[i % len];
+                break;
+            }
+        }
+
+        // If there is no user that can rebaseOptOut, then return false
+        if (user == address(0)) return false;
+
+        // RebaseOptOut
+        vm.prank(user);
+        oeth.rebaseOptOut();
+
+        console.log("OETHHandler.rebaseOptOut(), %s", names[user]);
+
+        return true;
+    }
+
+    function isNonRebasingAccount(address _user) internal view returns (bool) {
+        return oeth.nonRebasingCreditsPerToken(_user) > 0;
+    }
+
     // Todo:
     // P1:
     // - mint (done)
     // - burn (done)
     // - transfer (done)
-    // - rebase optIn
-    // - rebase optOut
+    // - rebase optIn (done)
+    // - rebase optOut (done)
     // - changeSupply
     // P2:
     // - transferFrom
