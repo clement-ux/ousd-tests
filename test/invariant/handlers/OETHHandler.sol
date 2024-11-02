@@ -23,6 +23,7 @@ contract OETHHandler is BaseHandler {
 
     uint256 private maxCreditMintable;
     uint256 private resolutionIncrease;
+    uint256 private maxTotalSupplyIncrease;
 
     address[] private holders;
 
@@ -44,7 +45,8 @@ contract OETHHandler is BaseHandler {
         address[] memory _holders,
         IVault _vault,
         uint256 _maxCreditMintable,
-        uint256 _resolutionIncrease
+        uint256 _resolutionIncrease,
+        uint256 _maxTotalSupplyIncrease
     ) {
         oeth = OETH(_oeth);
 
@@ -55,6 +57,7 @@ contract OETHHandler is BaseHandler {
 
         resolutionIncrease = _resolutionIncrease;
         maxCreditMintable = _maxCreditMintable * _resolutionIncrease;
+        maxTotalSupplyIncrease = _maxTotalSupplyIncrease;
     }
 
     ////////////////////////////////////////////////////
@@ -196,12 +199,55 @@ contract OETHHandler is BaseHandler {
         }
     }
 
+    function changeSupply(uint256 _seed) external {
+        numberOfCalls["oeth.changeSupply"]++;
+
+        uint256 totalSupply = oeth.totalSupply();
+        if (totalSupply == 0) {
+            numberOfCallsSkipped["oeth.changeSupply"]++;
+            console.log("OETHHandler.changeSupply: totalSupply null");
+            return;
+        }
+        if (oeth.rebasingCreditsHighres() == 0) {
+            numberOfCallsSkipped["oeth.changeSupply"]++;
+            console.log("OETHHandler.changeSupply: rebasing credit is null");
+            return;
+        }
+
+        // Calculate max total supply pct increase.
+        uint256 totalSupplyPctIncrease = _bound(_seed, 0, maxTotalSupplyIncrease);
+
+        // Calculate new total supply.
+        uint256 newTotalSupply = totalSupply * (1e18 + totalSupplyPctIncrease) / 1e18;
+
+        uint256 nonRebasingSupply = oeth.nonRebasingSupply();
+
+        // Handle situations that might revert.
+        if (newTotalSupply <= nonRebasingSupply) {
+            numberOfCallsSkipped["oeth.changeSupply"]++;
+            console.log("OETHHandler.changeSupply: new totalSupply == nonRebasingSupply");
+            return;
+        }
+        if ((min(newTotalSupply, ~uint128(0)) - nonRebasingSupply) >= oeth.rebasingCreditsPerTokenHighres() * 1e18) {
+            numberOfCallsSkipped["oeth.changeSupply"]++;
+            console.log("OETHHandler.changeSupply: new totalSupply > _rebasingCredits");
+            return;
+        }
+
+        // Change total supply
+        vm.prank(address(vault));
+        oeth.changeSupply(newTotalSupply);
+
+        // Log
+        console.log("OETHHandler.changeSupply(%18e), pct increase: %16e%", newTotalSupply, totalSupplyPctIncrease);
+    }
+
     function _rebaseOptIn(uint256 _seed) internal returns (bool) {
         address user;
         uint256 len = holders.length;
         uint256 initial = _seed % len;
         for (uint256 i = initial; i < initial + len; i++) {
-            if (isNonRebasingAccount(holders[i % len])) {
+            if (_isNonRebasingAccount(holders[i % len])) {
                 user = holders[i % len];
                 break;
             }
@@ -224,7 +270,7 @@ contract OETHHandler is BaseHandler {
         uint256 len = holders.length;
         uint256 initial = _seed % len;
         for (uint256 i = initial; i < initial + len; i++) {
-            if (!isNonRebasingAccount(holders[i % len])) {
+            if (!_isNonRebasingAccount(holders[i % len])) {
                 user = holders[i % len];
                 break;
             }
@@ -242,7 +288,7 @@ contract OETHHandler is BaseHandler {
         return true;
     }
 
-    function isNonRebasingAccount(address _user) internal view returns (bool) {
+    function _isNonRebasingAccount(address _user) internal view returns (bool) {
         return oeth.nonRebasingCreditsPerToken(_user) > 0;
     }
 
@@ -253,7 +299,7 @@ contract OETHHandler is BaseHandler {
     // - transfer (done)
     // - rebase optIn (done)
     // - rebase optOut (done)
-    // - changeSupply
+    // - changeSupply (done)
     // P2:
     // - transferFrom
     // - approve
