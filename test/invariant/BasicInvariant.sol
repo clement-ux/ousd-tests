@@ -14,7 +14,7 @@ contract Invariant_Basic_Test_ is Invariant_Base_Test_ {
     //////////////////////////////////////////////////////
     uint256 private constant NUM_HOLDERS = 3;
     uint256 private constant RESOLUTION_INCREASE = 1e9;
-    uint256 private constant MAX_CREDIT_MINTABLE = 1_000_000 ether; // 1M
+    uint256 private constant MAX_MINTABLE = 100_000_000 ether; // 100M
     uint256 private constant MAX_TOTALSUPPLY_INCREASE = 10e16; // 10%
 
     //////////////////////////////////////////////////////
@@ -36,9 +36,7 @@ contract Invariant_Basic_Test_ is Invariant_Base_Test_ {
         }
 
         // --- Deploy Handlers ---
-        oethHandler = new OETHHandler(
-            address(oeth), holders, vault, MAX_CREDIT_MINTABLE, RESOLUTION_INCREASE, MAX_TOTALSUPPLY_INCREASE
-        );
+        oethHandler = new OETHHandler(address(oeth), holders, vault, MAX_MINTABLE, MAX_TOTALSUPPLY_INCREASE);
 
         // --- Set Selectors Weight ---
         oethHandler.setSelectorWeight(oethHandler.mint.selector, 3_000);

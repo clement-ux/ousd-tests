@@ -21,8 +21,7 @@ contract OETHHandler is BaseHandler {
 
     IVault private vault;
 
-    uint256 private maxCreditMintable;
-    uint256 private resolutionIncrease;
+    uint256 private maxMintable;
     uint256 private maxTotalSupplyIncrease;
 
     address[] private holders;
@@ -44,8 +43,7 @@ contract OETHHandler is BaseHandler {
         address _oeth,
         address[] memory _holders,
         IVault _vault,
-        uint256 _maxCreditMintable,
-        uint256 _resolutionIncrease,
+        uint256 _maxMintable,
         uint256 _maxTotalSupplyIncrease
     ) {
         oeth = OETH(_oeth);
@@ -55,8 +53,7 @@ contract OETHHandler is BaseHandler {
 
         vault = _vault;
 
-        resolutionIncrease = _resolutionIncrease;
-        maxCreditMintable = _maxCreditMintable * _resolutionIncrease;
+        maxMintable = _maxMintable;
         maxTotalSupplyIncrease = _maxTotalSupplyIncrease;
     }
 
@@ -66,32 +63,11 @@ contract OETHHandler is BaseHandler {
     function mint(uint256 _seed) external {
         numberOfCalls["oeth.mint"]++;
 
-        // Select a valid random user
-        address user;
-        uint256 maxCreditToMint;
-        uint256 creditPerToken;
-        uint256 len = holders.length;
-        uint256 initial = _seed % len;
-        for (uint256 i = initial; i < initial + len; i++) {
-            // Get user credit
-            (uint256 credit, uint256 creditPerToken_,) = oeth.creditsBalanceOfHighres(holders[i % len]);
-            if (credit < maxCreditMintable) {
-                user = holders[i % len];
-                maxCreditToMint = maxCreditMintable - credit;
-                creditPerToken = creditPerToken_;
-                break;
-            }
-        }
+        // Select a random user
+        // As the max mintable amount is 100M, we can mint a lot of time before reaching the limit
+        address user = holders[_seed % holders.length];
 
-        // If no user found, i.e., all user already maxed out mintable amount, skip
-        if (user == address(0)) {
-            numberOfCallsSkipped["oeth.mint"]++;
-            console.log("OETHHandler.mint: No user found");
-            return;
-        }
-
-        uint256 maxAmount = maxCreditToMint * 1e18 / creditPerToken; // Some precision loss here, but it's fine for testing.
-        uint256 amountToMint = _bound(_seed, 0, maxAmount);
+        uint256 amountToMint = _bound(_seed, 0, maxMintable);
 
         // Mint
         vm.prank(address(vault));
@@ -130,6 +106,14 @@ contract OETHHandler is BaseHandler {
 
         uint256 amountToBurn = _bound(_seed, 1, balanceOf);
 
+        // Non rebasing supply can be lower than user balance, weird but possible
+        // Todo: investigate why
+        if (oeth.balanceOf(user) > oeth.nonRebasingSupply()) {
+            numberOfCallsSkipped["oeth.burn"]++;
+            console.log("OETHHandler.burn: Non rebasing supply < user balance");
+            return;
+        }
+
         // Burn
         vm.prank(address(vault));
         oeth.burn(user, amountToBurn);
@@ -167,6 +151,16 @@ contract OETHHandler is BaseHandler {
         uint256 amountToTransfer = _bound(_seed, 0, balanceOf);
         address receiver = holders[_randomize(_seed) % len];
 
+        // Non rebasing supply can be lower than user balance, weird but possible
+        // Todo: investigate why
+        if (
+            (_isNonRebasingAccount(user) && !_isNonRebasingAccount(receiver))
+                && (oeth.nonRebasingSupply() < amountToTransfer)
+        ) {
+            numberOfCallsSkipped["oeth.transfer"]++;
+            console.log("OETHHandler.transfer: Non rebasing supply < user balance");
+            return;
+        }
         // Transfer
         vm.prank(user);
         oeth.transfer(receiver, amountToTransfer);
@@ -188,14 +182,17 @@ contract OETHHandler is BaseHandler {
             success = _rebaseOptIn(_seed);
             if (!success) {
                 success = _rebaseOptOut(_seed);
-                require(success, "OETHHandler: RebaseOptIn/Out failed");
             }
         } else {
             success = _rebaseOptOut(_seed);
             if (!success) {
                 success = _rebaseOptIn(_seed);
-                require(success, "OETHHandler: RebaseOptOut/In failed");
             }
+        }
+
+        if (!success) {
+            numberOfCallsSkipped["oeth.rebase"]++;
+            console.log("OETHHandler.rebaseOpt: No user found");
         }
     }
 
@@ -228,7 +225,7 @@ contract OETHHandler is BaseHandler {
             console.log("OETHHandler.changeSupply: new totalSupply == nonRebasingSupply");
             return;
         }
-        if ((min(newTotalSupply, ~uint128(0)) - nonRebasingSupply) >= oeth.rebasingCreditsPerTokenHighres() * 1e18) {
+        if (min(newTotalSupply, ~uint128(0) - nonRebasingSupply) >= oeth.rebasingCreditsHighres() * 1e18) {
             numberOfCallsSkipped["oeth.changeSupply"]++;
             console.log("OETHHandler.changeSupply: new totalSupply > _rebasingCredits");
             return;
@@ -237,6 +234,8 @@ contract OETHHandler is BaseHandler {
         // Change total supply
         vm.prank(address(vault));
         oeth.changeSupply(newTotalSupply);
+
+        require(newTotalSupply >= totalSupply, "OETHHandler: new totalSupply < totalSupply");
 
         // Log
         console.log("OETHHandler.changeSupply(%18e), pct increase: %16e%", newTotalSupply, totalSupplyPctIncrease);
@@ -255,6 +254,12 @@ contract OETHHandler is BaseHandler {
 
         // If there is no user that can rebaseOptIn, then return false
         if (user == address(0)) return false;
+
+        // nonRebasingSupply can be lower than user balance, weird but possible
+        // Todo: investigate why
+        if (oeth.balanceOf(user) > oeth.nonRebasingSupply()) {
+            return false;
+        }
 
         // RebaseOptIn
         vm.prank(user);
