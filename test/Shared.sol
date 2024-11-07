@@ -55,6 +55,7 @@ abstract contract Shared_Test_ is Base_Test_ {
         dave = makeAddr("Dave");
         eve = makeAddr("Eve");
         frank = makeAddr("Frank");
+        dead = makeAddr("Dead");
 
         // Add users to the list
         users.push(alice);
