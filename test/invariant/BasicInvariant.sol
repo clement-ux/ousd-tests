@@ -20,7 +20,6 @@ contract Invariant_Basic_Test_ is Invariant_Base_Test_ {
     //////////////////////////////////////////////////////
     /// --- STORAGE
     //////////////////////////////////////////////////////
-    OETHHandler private oethHandler;
     DistributionHandler private distributionHandler;
 
     //////////////////////////////////////////////////////
@@ -57,7 +56,17 @@ contract Invariant_Basic_Test_ is Invariant_Base_Test_ {
 
         // All call will be done through the distributor, so we set it as the target contract
         targetContract(address(distributionHandler));
+
+        // Mint 1e12 to a user that will keep it and do nothing during all the test
+        // This prevent many false positive in the invariant
+        vm.prank(address(vault));
+        oeth.mint(dead, 1e12 ether);
     }
 
-    function invariant_A() public {}
+    function invariant_General() public view {
+        assert_Invariant_A();
+        assert_Invariant_B(100 wei);
+        assert_Invariant_C(100 wei);
+        assert_Invariant_D(100 wei, 100 wei);
+    }
 }
