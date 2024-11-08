@@ -70,5 +70,6 @@ contract Invariant_Basic_Test_ is Invariant_Base_Test_ {
         assert_Invariant_D({threshhold: 100 wei, errorAbs: 100 wei});
         assert_Invariant_E({errorAbs: 100 wei});
         assert_Invariant_F();
+        assert_Invariant_G();
     }
 }

@@ -33,8 +33,10 @@ contract OETHHandler is BaseHandler {
     uint256 public sum_of_burn;
     uint256 public sum_of_transfer;
 
-    mapping(address => uint256) public sum_of_send;
-    mapping(address => uint256) public sum_of_receive;
+    mapping(address => uint256) public sum_of_mint_per_user;
+    mapping(address => uint256) public sum_of_burn_per_user;
+    mapping(address => uint256) public sum_of_send_per_user;
+    mapping(address => uint256) public sum_of_receive_per_user;
 
     //////////////////////////////////////////////////////
     /// --- CONSTRUCTOR
@@ -75,6 +77,7 @@ contract OETHHandler is BaseHandler {
 
         // Update sum of mint
         sum_of_mint += amountToMint;
+        sum_of_mint_per_user[user] += amountToMint;
 
         // Log
         console.log("OETHHandler.mint(%18e), %s", amountToMint, names[user]);
@@ -120,6 +123,7 @@ contract OETHHandler is BaseHandler {
 
         // Update sum of mint
         sum_of_burn += amountToBurn;
+        sum_of_burn_per_user[user] += amountToBurn;
 
         // Log
         console.log("OETHHandler.burn(%18e), %s", amountToBurn, names[user]);
@@ -167,8 +171,8 @@ contract OETHHandler is BaseHandler {
 
         // Update sum of transfer and co.
         sum_of_transfer += amountToTransfer;
-        sum_of_send[user] += amountToTransfer;
-        sum_of_receive[receiver] += amountToTransfer;
+        sum_of_send_per_user[user] += amountToTransfer;
+        sum_of_receive_per_user[receiver] += amountToTransfer;
 
         // Log
         console.log("OETHHandler.transfer(%18e), %s -> %s", amountToTransfer, names[user], names[receiver]);

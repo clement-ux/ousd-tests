@@ -39,10 +39,8 @@ abstract contract Invariant_Base_Test_ is Shared_Test_ {
     // Invariant D: nonRebasingSupply == ∑user balance, ∀ rebasedOptOut user
     // Invariant E: _rebasingCredits  == ∑user _creditBalances, ∀ rebasedOptIn  user
     // Invariant F: _rebasingCreditsPerToken <= 1e27
-    // --- WIP ---
-    // Invariant x: ∀ user, balance == sum_of_mint - sum_of_burn - sum_of_send + sum_of_receive
-    // Invariant x: ∀ rebasedOptIn  user, nonRebasingCreditsPerToken == 0
-    // Invariant x: ∀ rebasedOptOut user, nonRebasingCreditsPerToken == _rebasingCreditsPerToken
+    // Invariant G: ∀ rebasedOptIn  user, nonRebasingCreditsPerToken == 0
+    // Invariant G: ∀ rebasedOptOut user, nonRebasingCreditsPerToken >= _rebasingCreditsPerToken
 
     function assert_Invariant_A() public view {
         uint256 totalSupply = oeth.totalSupply();
@@ -96,6 +94,24 @@ abstract contract Invariant_Base_Test_ is Shared_Test_ {
 
     function assert_Invariant_F() public view {
         assertGe(1e27, oeth.rebasingCreditsPerTokenHighres(), "rebasingCreditsPerToken <= 1e27");
+    }
+
+    function assert_Invariant_G() public view {
+        for (uint256 i = 0; i < holders.length; i++) {
+            if (!_isNonRebasingAccount(holders[i])) {
+                assertEq(
+                    0,
+                    oeth.nonRebasingCreditsPerToken(holders[i]),
+                    "nonRebasingCreditsPerToken == 0, for each rebasedOptIn user"
+                );
+            } else {
+                assertGe(
+                    oeth.nonRebasingCreditsPerToken(holders[i]),
+                    oeth.rebasingCreditsPerTokenHighres(),
+                    "nonRebasingCreditsPerToken >= _rebasingCreditsPerToken, for each rebasedOptOut user"
+                );
+            }
+        }
     }
 
     function _sumUsersBalance() public view returns (uint256 sum) {
