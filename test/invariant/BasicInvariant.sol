@@ -65,8 +65,9 @@ contract Invariant_Basic_Test_ is Invariant_Base_Test_ {
 
     function invariant_General() public view {
         assert_Invariant_A();
-        assert_Invariant_B(100 wei);
-        assert_Invariant_C(100 wei);
-        assert_Invariant_D(100 wei, 100 wei);
+        assert_Invariant_B({errorAbs: 100 wei});
+        assert_Invariant_C({errorAbs: 100 wei});
+        assert_Invariant_D({threshhold: 100 wei, errorAbs: 100 wei});
+        assert_Invariant_E({errorAbs: 100 wei});
     }
 }

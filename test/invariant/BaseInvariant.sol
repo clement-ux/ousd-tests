@@ -83,6 +83,17 @@ abstract contract Invariant_Base_Test_ is Shared_Test_ {
         );
     }
 
+    function assert_Invariant_E(uint256 errorAbs) public view {
+        uint256 rebasingCredits = oeth.rebasingCreditsHighres();
+
+        assertApproxEqAbs(
+            rebasingCredits,
+            _sumCreditBalanceIn(),
+            errorAbs,
+            "rebasingCredits == sum user credit balance, for each rebasedOptIn user"
+        );
+    }
+
     function _sumUsersBalance() public view returns (uint256 sum) {
         for (uint256 i = 0; i < holders.length; i++) {
             sum += oeth.balanceOf(holders[i]);
@@ -96,6 +107,17 @@ abstract contract Invariant_Base_Test_ is Shared_Test_ {
                 sum += oeth.balanceOf(holders[i]);
             }
         }
+    }
+
+    function _sumCreditBalanceIn() public view returns (uint256 sum) {
+        for (uint256 i = 0; i < holders.length; i++) {
+            if (!_isNonRebasingAccount(holders[i])) {
+                (uint256 creditBalance_,,) = oeth.creditsBalanceOfHighres(holders[i]);
+                sum += creditBalance_;
+            }
+        }
+        (uint256 creditBalance,,) = oeth.creditsBalanceOfHighres(dead);
+        sum += creditBalance;
     }
 
     function _isNonRebasingAccount(address _user) internal view returns (bool) {
