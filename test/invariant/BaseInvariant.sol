@@ -43,9 +43,9 @@ abstract contract Invariant_Base_Test_ is Shared_Test_ {
     // Invariant E: _rebasingCredits  == ∑user _creditBalances, ∀ rebasedOptIn  user
     // Invariant F: _rebasingCreditsPerToken <= 1e27
     // Invariant G: ∀ rebasedOptIn  user, nonRebasingCreditsPerToken == 0
-    // Invariant G: ∀ rebasedOptOut user, nonRebasingCreditsPerToken >= _rebasingCreditsPerToken
-    // Invariant H: ∀ user rebasedOptIn, balanceOf == _creditBalances / _rebasingCreditsPerToken
-    // Invariant H: ∀ user rebasedOptOut, balanceOf == _creditBalances / nonRebasingCreditsPerToken[_account]
+    // Invariant G: ∀ rebasedOptOut user, nonRebasingCreditsPerToken >= _rebasingCreditsPerToken 
+    // Invariant H: ∀ user rebasedOptIn, balanceOf == _creditBalances / _rebasingCreditsPerToken // note: useless like this, need to change
+    // Invariant H: ∀ user rebasedOptOut, balanceOf == _creditBalances / nonRebasingCreditsPerToken[_account] // note: useless like this, need to change
     // Invariant I: ∀ user rebasedOptIn, rebaseState == RebaseState.OPT_IN
     // Invariant I: ∀ user rebasedOptOut, rebaseState == RebaseState.OPT_OUT
 
