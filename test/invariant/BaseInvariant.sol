@@ -41,6 +41,11 @@ abstract contract Invariant_Base_Test_ is Shared_Test_ {
     // Invariant F: _rebasingCreditsPerToken <= 1e27
     // Invariant G: ∀ rebasedOptIn  user, nonRebasingCreditsPerToken == 0
     // Invariant G: ∀ rebasedOptOut user, nonRebasingCreditsPerToken >= _rebasingCreditsPerToken
+    // Invariant H: ∀ user rebasedOptIn, balanceOf == _creditBalances / _rebasingCreditsPerToken
+    // Invariant H: ∀ user rebasedOptOut, balanceOf == _creditBalances / nonRebasingCreditsPerToken[_account]
+    // --- WIP ---
+    // Invariant I: ∀ user rebasedOptIn, rebaseState == RebaseState.OPT_IN
+    // Invariant I: ∀ user rebasedOptOut, rebaseState == RebaseState.OPT_OUT
 
     function assert_Invariant_A() public view {
         uint256 totalSupply = oeth.totalSupply();
@@ -109,6 +114,30 @@ abstract contract Invariant_Base_Test_ is Shared_Test_ {
                     oeth.nonRebasingCreditsPerToken(holders[i]),
                     oeth.rebasingCreditsPerTokenHighres(),
                     "nonRebasingCreditsPerToken >= _rebasingCreditsPerToken, for each rebasedOptOut user"
+                );
+            }
+        }
+    }
+
+    function assert_Invariant_H(uint256 errorAbsIn, uint256 errorAbsOut) public view {
+        for (uint256 i = 0; i < holders.length; i++) {
+            if (!_isNonRebasingAccount(holders[i])) {
+                (uint256 creditBalance,,) = oeth.creditsBalanceOfHighres(holders[i]);
+                uint256 creditPerToken = oeth.rebasingCreditsPerTokenHighres();
+                assertApproxEqAbs(
+                    creditBalance.divPrecisely(creditPerToken),
+                    oeth.balanceOf(holders[i]),
+                    errorAbsIn,
+                    "balanceOf == _creditBalances / _rebasingCreditsPerToken, for each rebasedOptIn user"
+                );
+            } else {
+                (uint256 creditBalance,,) = oeth.creditsBalanceOfHighres(holders[i]);
+                uint256 creditPerToken = oeth.nonRebasingCreditsPerToken(holders[i]);
+                assertApproxEqAbs(
+                    creditBalance.divPrecisely(creditPerToken),
+                    oeth.balanceOf(holders[i]),
+                    errorAbsOut,
+                    "balanceOf == _creditBalances / nonRebasingCreditsPerToken, for each rebasedOptOut user"
                 );
             }
         }
