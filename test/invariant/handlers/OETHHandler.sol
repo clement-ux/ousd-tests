@@ -37,6 +37,7 @@ contract OETHHandler is BaseHandler {
     mapping(address => uint256) public sum_of_burn_per_user;
     mapping(address => uint256) public sum_of_send_per_user;
     mapping(address => uint256) public sum_of_receive_per_user;
+    mapping(address => bool) public rebaseInOrOut;
 
     //////////////////////////////////////////////////////
     /// --- CONSTRUCTOR
@@ -269,6 +270,8 @@ contract OETHHandler is BaseHandler {
         vm.prank(user);
         oeth.rebaseOptIn();
 
+        rebaseInOrOut[user] = true;
+
         console.log("OETHHandler.rebaseOptIn(), %s", names[user]);
 
         return true;
@@ -291,6 +294,8 @@ contract OETHHandler is BaseHandler {
         // RebaseOptOut
         vm.prank(user);
         oeth.rebaseOptOut();
+
+        rebaseInOrOut[user] = true;
 
         console.log("OETHHandler.rebaseOptOut(), %s", names[user]);
 

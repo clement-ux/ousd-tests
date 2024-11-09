@@ -4,6 +4,9 @@ pragma solidity 0.8.27;
 // Test imports
 import {Shared_Test_} from "test/Shared.sol";
 
+// Contract
+import {OUSD} from "origin/token/OUSD.sol";
+
 import {StableMath} from "origin/utils/StableMath.sol";
 import {SafeMath} from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
@@ -43,7 +46,6 @@ abstract contract Invariant_Base_Test_ is Shared_Test_ {
     // Invariant G: ∀ rebasedOptOut user, nonRebasingCreditsPerToken >= _rebasingCreditsPerToken
     // Invariant H: ∀ user rebasedOptIn, balanceOf == _creditBalances / _rebasingCreditsPerToken
     // Invariant H: ∀ user rebasedOptOut, balanceOf == _creditBalances / nonRebasingCreditsPerToken[_account]
-    // --- WIP ---
     // Invariant I: ∀ user rebasedOptIn, rebaseState == RebaseState.OPT_IN
     // Invariant I: ∀ user rebasedOptOut, rebaseState == RebaseState.OPT_OUT
 
@@ -138,6 +140,22 @@ abstract contract Invariant_Base_Test_ is Shared_Test_ {
                     oeth.balanceOf(holders[i]),
                     errorAbsOut,
                     "balanceOf == _creditBalances / nonRebasingCreditsPerToken, for each rebasedOptOut user"
+                );
+            }
+        }
+    }
+
+    function assert_Invariant_I() public view {
+        for (uint256 i = 0; i < holders.length; i++) {
+            if (!_isNonRebasingAccount(holders[i]) && oethHandler.rebaseInOrOut(holders[i])) {
+                assertTrue(
+                    oeth.rebaseState(holders[i]) == OUSD.RebaseOptions.OptIn,
+                    "rebaseState == RebaseState.OPT_IN, for each rebasedOptIn user"
+                );
+            } else if (_isNonRebasingAccount(holders[i]) && oethHandler.rebaseInOrOut(holders[i])) {
+                assertTrue(
+                    oeth.rebaseState(holders[i]) == OUSD.RebaseOptions.OptOut,
+                    "rebaseState == RebaseState.OPT_OUT, for each rebasedOptOut user"
                 );
             }
         }
