@@ -110,9 +110,11 @@ contract OETHHandler is BaseHandler {
 
         uint256 amountToBurn = _bound(_seed, 1, balanceOf);
 
-        // Non rebasing supply can be lower than user balance, weird but possible
-        // Todo: investigate why
-        if (oeth.balanceOf(user) > oeth.nonRebasingSupply()) {
+        // Non rebasing supply can be lower than user balance.
+        // This can happen when there is low balance reabseIn or Out and change supply increase a lot the supply.
+        // This should be compensated by having dead users, that are rebaseOptIn and OptOut.
+        if (_isNonRebasingAccount(user) && oeth.balanceOf(user) > oeth.nonRebasingSupply()) {
+            // This should not happen, but just in case.
             numberOfCallsSkipped["oeth.burn"]++;
             console.log("OETHHandler.burn: Non rebasing supply < user balance");
             return;
@@ -260,9 +262,11 @@ contract OETHHandler is BaseHandler {
         // If there is no user that can rebaseOptIn, then return false
         if (user == address(0)) return false;
 
-        // nonRebasingSupply can be lower than user balance, weird but possible
-        // Todo: investigate why
-        if (oeth.balanceOf(user) > oeth.nonRebasingSupply()) {
+        // Non rebasing supply can be lower than user balance.
+        // This can happen when there is low balance reabseIn or Out and change supply increase a lot the supply.
+        // This should be compensated by having dead users, that are rebaseOptIn and OptOut.
+        if (_isNonRebasingAccount(user) && oeth.balanceOf(user) > oeth.nonRebasingSupply()) {
+            // This should not happen, but just in case.
             return false;
         }
 

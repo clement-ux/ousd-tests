@@ -54,22 +54,20 @@ contract Invariant_Basic_Test_ is Invariant_Base_Test_ {
         // --- Deploy Distribution Handler ---
         distributionHandler = new DistributionHandler(targetContracts, weightsDistributorHandler);
 
-        // All call will be done through the distributor, so we set it as the target contract
+        // All call will be done through the distributor, so we set it as the target contract.
         targetContract(address(distributionHandler));
 
         // --- Adjust contract to real world ---
-        
-        // The following transaction allow to avoid false positive in the invariant.
-        // Some DoS or invariant break due to the fact that there is no user opt-out or opt-in.
+        //
+        // The following transactions allow to avoid false positive in the invariant.
+        // Some DoS or invariant breaks due to the fact that there is no user opt-out or opt-in.
         // This is really have low chance to happen in production.
 
-        // Mint 1e12 to a user that will keep it and do nothing during all the test
-        // This prevent many false positive in the invariant
+        // Mint 1e12 to a user that will keep it and do nothing during all the test.
         vm.prank(address(vault));
         oeth.mint(dead, 1e12);
 
-        // Mint 1e12 to a user that will keep it and do nothing during all the test
-        // + rebaseOptOut
+        // Mint 1e12 to a user that will keep it and do nothing during all the test and rebaseOptOut.
         vm.prank(address(vault));
         oeth.mint(dead2, 1e12);
         vm.prank(dead2);
@@ -80,7 +78,7 @@ contract Invariant_Basic_Test_ is Invariant_Base_Test_ {
         assert_Invariant_A();
         assert_Invariant_B({errorRel: 1e12}); // 0.01bps
         assert_Invariant_C({errorRel: 1e12}); // 0.01bps
-        assert_Invariant_D({threshhold: 1e6, errorRel: 1e14}); // 1bps
+        assert_Invariant_D({threshhold: 0 wei, errorRel: 1e14}); // 1bps
         assert_Invariant_E({errorRel: 1e12}); // 0.01bps
         assert_Invariant_F();
         assert_Invariant_G();
