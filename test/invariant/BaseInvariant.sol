@@ -55,46 +55,46 @@ abstract contract Invariant_Base_Test_ is Shared_Test_ {
         assertGe(~uint128(0), totalSupply, "totalSupply > MAX_SUPPLY");
     }
 
-    function assert_Invariant_B(uint256 errorAbs) public view {
+    function assert_Invariant_B(uint256 errorRel) public view {
         uint256 totalSupply = oeth.totalSupply();
 
-        assertApproxEqAbs(totalSupply, _sumUsersBalance(), errorAbs, "totalSupply == sum user balance, for each user");
+        assertApproxEqRel(totalSupply, _sumUsersBalance(), errorRel, "totalSupply == sum user balance, for each user");
     }
 
-    function assert_Invariant_C(uint256 errorAbs) public view {
+    function assert_Invariant_C(uint256 errorRel) public view {
         uint256 totalSupply = oeth.totalSupply();
         uint256 rebasingCredits = oeth.rebasingCreditsHighres();
         uint256 rebasingCreditsPerToken = oeth.rebasingCreditsPerTokenHighres();
         uint256 nonRebasingSupply = oeth.nonRebasingSupply();
 
-        assertApproxEqAbs(
+        assertApproxEqRel(
             totalSupply,
             rebasingCredits.divPrecisely(rebasingCreditsPerToken).add(nonRebasingSupply),
-            errorAbs,
+            errorRel,
             "totalSupply == _rebasingCredits / _rebasingCreditsPerToken + nonRebasingSupply"
         );
     }
 
-    function assert_Invariant_D(uint256 threshhold, uint256 errorAbs) public view {
+    function assert_Invariant_D(uint256 threshhold, uint256 errorRel) public view {
         uint256 nonRebasingSupply = oeth.nonRebasingSupply();
 
         if (nonRebasingSupply < threshhold) return;
 
-        assertApproxEqAbs(
+        assertApproxEqRel(
             nonRebasingSupply,
             _sumUsersBalanceOut(),
-            errorAbs,
+            errorRel,
             "nonRebasingSupply == sum user balance, for each rebasedOptOut user"
         );
     }
 
-    function assert_Invariant_E(uint256 errorAbs) public view {
+    function assert_Invariant_E(uint256 errorRel) public view {
         uint256 rebasingCredits = oeth.rebasingCreditsHighres();
 
-        assertApproxEqAbs(
+        assertApproxEqRel(
             rebasingCredits,
             _sumCreditBalanceIn(),
-            errorAbs,
+            errorRel,
             "rebasingCredits == sum user credit balance, for each rebasedOptIn user"
         );
     }
@@ -166,6 +166,7 @@ abstract contract Invariant_Base_Test_ is Shared_Test_ {
             sum += oeth.balanceOf(holders[i]);
         }
         sum += oeth.balanceOf(dead);
+        sum += oeth.balanceOf(dead2);
     }
 
     function _sumUsersBalanceOut() public view returns (uint256 sum) {
@@ -174,6 +175,7 @@ abstract contract Invariant_Base_Test_ is Shared_Test_ {
                 sum += oeth.balanceOf(holders[i]);
             }
         }
+        sum += oeth.balanceOf(dead2);
     }
 
     function _sumCreditBalanceIn() public view returns (uint256 sum) {

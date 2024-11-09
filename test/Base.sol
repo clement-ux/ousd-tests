@@ -33,6 +33,7 @@ abstract contract Base_Test_ is Test {
     address public eve;
     address public frank;
     address public dead;
+    address public dead2;
 
     // --- Governance ---
     address public deployer;
@@ -63,6 +64,7 @@ abstract contract Base_Test_ is Test {
         _labelNotNull(eve, "Eve");
         _labelNotNull(frank, "Frank");
         _labelNotNull(dead, "Dead");
+        _labelNotNull(dead2, "Dead2");
 
         _labelNotNull(deployer, "Deployer");
         _labelNotNull(governor, "Governor");

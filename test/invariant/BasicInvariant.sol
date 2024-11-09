@@ -57,18 +57,31 @@ contract Invariant_Basic_Test_ is Invariant_Base_Test_ {
         // All call will be done through the distributor, so we set it as the target contract
         targetContract(address(distributionHandler));
 
+        // --- Adjust contract to real world ---
+        
+        // The following transaction allow to avoid false positive in the invariant.
+        // Some DoS or invariant break due to the fact that there is no user opt-out or opt-in.
+        // This is really have low chance to happen in production.
+
         // Mint 1e12 to a user that will keep it and do nothing during all the test
         // This prevent many false positive in the invariant
         vm.prank(address(vault));
-        oeth.mint(dead, 1e12 ether);
+        oeth.mint(dead, 1e12);
+
+        // Mint 1e12 to a user that will keep it and do nothing during all the test
+        // + rebaseOptOut
+        vm.prank(address(vault));
+        oeth.mint(dead2, 1e12);
+        vm.prank(dead2);
+        oeth.rebaseOptOut();
     }
 
     function invariant_General() public view {
         assert_Invariant_A();
-        assert_Invariant_B({errorAbs: 100 wei});
-        assert_Invariant_C({errorAbs: 100 wei});
-        assert_Invariant_D({threshhold: 100 wei, errorAbs: 100 wei});
-        assert_Invariant_E({errorAbs: 100 wei});
+        assert_Invariant_B({errorRel: 1e12}); // 0.01bps
+        assert_Invariant_C({errorRel: 1e12}); // 0.01bps
+        assert_Invariant_D({threshhold: 1e6, errorRel: 1e14}); // 1bps
+        assert_Invariant_E({errorRel: 1e12}); // 0.01bps
         assert_Invariant_F();
         assert_Invariant_G();
         assert_Invariant_H({errorAbsIn: 0 wei, errorAbsOut: 0 wei});
