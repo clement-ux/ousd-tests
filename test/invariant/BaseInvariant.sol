@@ -112,11 +112,12 @@ abstract contract Invariant_Base_Test_ is Shared_Test_ {
                     "nonRebasingCreditsPerToken == 0, for each rebasedOptIn user"
                 );
             } else {
-                assertGe(
-                    oeth.nonRebasingCreditsPerToken(holders[i]),
-                    oeth.rebasingCreditsPerTokenHighres(),
-                    "nonRebasingCreditsPerToken >= _rebasingCreditsPerToken, for each rebasedOptOut user"
-                );
+                // Not applicable for yield delegation
+                //assertGe(
+                //    oeth.nonRebasingCreditsPerToken(holders[i]),
+                //    oeth.rebasingCreditsPerTokenHighres(),
+                //    "nonRebasingCreditsPerToken >= _rebasingCreditsPerToken, for each rebasedOptOut user"
+                //);
             }
         }
     }
@@ -149,12 +150,12 @@ abstract contract Invariant_Base_Test_ is Shared_Test_ {
         for (uint256 i = 0; i < holders.length; i++) {
             if (!_isNonRebasingAccount(holders[i]) && oethHandler.rebaseInOrOut(holders[i])) {
                 assertTrue(
-                    oeth.rebaseState(holders[i]) == OUSD.RebaseOptions.OptIn,
+                    oeth.rebaseState(holders[i]) == OUSD.RebaseOptions.StdRebasing,
                     "rebaseState == RebaseState.OPT_IN, for each rebasedOptIn user"
                 );
             } else if (_isNonRebasingAccount(holders[i]) && oethHandler.rebaseInOrOut(holders[i])) {
                 assertTrue(
-                    oeth.rebaseState(holders[i]) == OUSD.RebaseOptions.OptOut,
+                    oeth.rebaseState(holders[i]) == OUSD.RebaseOptions.StdNonRebasing,
                     "rebaseState == RebaseState.OPT_OUT, for each rebasedOptOut user"
                 );
             }
