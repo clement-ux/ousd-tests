@@ -77,9 +77,7 @@ abstract contract Shared_Test_ is Base_Test_ {
         oeth = new OETH();
 
         // 3. Initialize proxy.
-        bytes memory data = abi.encodeWithSignature(
-            "initialize(address,uint256)", address(vault), 1e27
-        );
+        bytes memory data = abi.encodeWithSignature("initialize(address,uint256)", address(vault), 1e27);
 
         oethProxy.initialize(address(oeth), governor, data);
 
