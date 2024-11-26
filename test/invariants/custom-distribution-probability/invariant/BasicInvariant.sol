@@ -2,7 +2,7 @@
 pragma solidity 0.8.27;
 
 // Test imports
-import {Invariant_Base_Test_} from "test/invariant/BaseInvariant.sol";
+import {Invariant_Base_Test_} from "./BaseInvariant.sol";
 
 // Handlers
 import {OETHHandler} from "./handlers/OETHHandler.sol";

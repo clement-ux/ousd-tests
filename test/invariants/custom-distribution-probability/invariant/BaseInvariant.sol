@@ -2,7 +2,7 @@
 pragma solidity 0.8.27;
 
 // Test imports
-import {Shared_Test_} from "test/Shared.sol";
+import {Shared_Test_} from "../Shared.sol";
 
 // Contract
 import {OUSD} from "origin/token/OUSD.sol";

@@ -8,6 +8,7 @@ verbosity = 3
 show_progress = true
 ignored_warnings_from = [
     "dependencies/origin-dollar-1/contracts/contracts/proxies/",
+    "dependencies/origin-dollar-yd-1/contracts/contracts/proxies/",
 ]
 
 [invariant]

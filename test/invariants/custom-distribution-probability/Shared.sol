@@ -2,7 +2,7 @@
 pragma solidity 0.8.27;
 
 // Test imports
-import {Base_Test_} from "test/Base.sol";
+import {Base_Test_} from "./Base.sol";
 
 // Contracts
 import {OETH} from "origin/token/OETH.sol";
