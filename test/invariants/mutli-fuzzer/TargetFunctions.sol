@@ -7,6 +7,9 @@ import {console} from "forge-std/Console.sol";
 // Utils
 import {Properties} from "./Properties.sol";
 
+// Contracts
+import {OUSD} from "origin/token/OUSD.sol";
+
 /// @title TargetFunctions contract
 /// @notice Use to handle all calls to the tested contract.
 abstract contract TargetFunctions is Properties {
@@ -32,7 +35,7 @@ abstract contract TargetFunctions is Properties {
         address user = users[_account % users.length];
 
         if (oeth.totalSupply() + _amount >= MAX_SUPPLY && DOS_CHECK) {
-            console.log("OETH function: mint() \t to: Skipped because: Max supply reached");
+            console.log("OETH function: mint() \t from: Skipped because: Max supply reached");
             return;
         }
 
@@ -41,7 +44,7 @@ abstract contract TargetFunctions is Properties {
         oeth.mint(user, _amount);
 
         // Idea: use a color when the value is high.
-        console.log("OETH function: mint() \t to:   %s \t amount: %18e", names[user], _amount);
+        console.log("OETH function: mint() \t from: %s \t to: %s \t amount: %18e", "Null", names[user], _amount);
     }
 
     /// @notice Handler to burn a random amount of OETH from a random user.
@@ -82,7 +85,7 @@ abstract contract TargetFunctions is Properties {
         oeth.burn(user, _amount);
 
         // Idea: use a color when the value is high.
-        console.log("OETH function: burn() \t from: %s \t amount: %18e", names[user], _amount);
+        console.log("OETH function: burn() \t from: %s \t to: %s \t amount: %18e", names[user], "Null", _amount);
     }
 
     /// @notice Handler to change the totalSupply of OETH.
@@ -139,6 +142,113 @@ abstract contract TargetFunctions is Properties {
         );
     }
 
+    /// @notice Handler to transfer a random amount of OETH from a random user to another random user.
+    /// @param _from The index of the user to transfer from.
+    /// @param _to The index of the user to transfer to.
+    /// @param _amount The amount to transfer. The goal here is (when no t is DOS_CHECK mode),
+    /// to try to transfer sometime more than the user has.
+    function handler_transfer(uint8 _from, uint8 _to, uint96 _amount) public {
+        // Select random user with balance > 0.
+        address from;
+        uint256 balanceOf;
+        uint256 len = users.length;
+        for (uint256 i = _from; i < _from + len; i++) {
+            uint256 balanceOf_ = oeth.balanceOf(users[i % len]);
+            if (balanceOf_ > 0) {
+                from = users[i % len];
+                balanceOf = balanceOf_;
+                break;
+            }
+        }
+
+        // If no user found, i.e. no user have tokens.
+        if (from == address(0)) {
+            console.log("OETH function: transfer() \t from: Skipped because: No user found");
+            return;
+        }
+
+        // This should be the only case where transfer can revert.
+        if (DOS_CHECK) _amount = uint96(_bound(_amount, 0, balanceOf));
+
+        // User can send to himself.
+        address to = users[_to % users.length];
+
+        hevm.prank(from);
+        oeth.transfer(to, _amount);
+
+        console.log("OETH function: transfer() \t from: %s \t to: %s \t amount: %18e", names[from], names[to], _amount);
+    }
+
+    /// @notice Handler to rebaseOptIn a random user.
+    /// @param _account The index of the user to rebaseOptIn.
+    function handler_rebaseOptIn(uint8 _account) public {
+        // Select random user with:
+        // alternativeCreditsPerToken[_account] > 0 || balance == 0
+        // &&
+        // state == RebaseOptions.StdNonRebasing || state == RebaseOptions.NotSet,
+        address user;
+        uint256 len = users.length;
+        for (uint256 i = _account; i < _account + len; i++) {
+            address _user = users[i % len];
+            OUSD.RebaseOptions state = oeth.rebaseState(_user);
+            if (
+                (oeth.nonRebasingCreditsPerToken(_user) > 0 || oeth.balanceOf(_user) == 0)
+                    && (state == OUSD.RebaseOptions.StdNonRebasing || state == OUSD.RebaseOptions.NotSet)
+            ) {
+                user = _user;
+                break;
+            }
+        }
+
+        // If no user found, Todo: add i.e.
+        // Because there is no restriction that address 0 can rebaseOptIn, we always prevent it, no matter DOS_CHECK.
+        if (user == address(0)) {
+            console.log("OETH function: rebaseOptIn() \t from: Skipped because: No user found");
+            return;
+        }
+
+        // RebaseOptIn
+        hevm.prank(user);
+        oeth.rebaseOptIn();
+
+        console.log("OETH function: rebaseOptIn() \t from: %s", names[user]);
+    }
+
+    /// @notice Handler to rebaseOptOut a random user.
+    /// @param _account The index of the user to rebaseOptOut.
+    function handler_rebaseOptOut(uint8 _account) public {
+        // Select a random user with:
+        // alternativeCreditsPerToken[_account] == 0
+        // &&
+        // state == RebaseOptions.StdRebasing || state == RebaseOptions.NotSet
+        address user;
+        uint256 len = users.length;
+        for (uint256 i = _account; i < _account + len; i++) {
+            address _user = users[i % len];
+            OUSD.RebaseOptions state = oeth.rebaseState(_user);
+            if (
+                oeth.nonRebasingCreditsPerToken(_user) == 0
+                    && (state == OUSD.RebaseOptions.StdRebasing || state == OUSD.RebaseOptions.NotSet)
+            ) {
+                user = _user;
+                break;
+            }
+        }
+
+        // If no user found, Todo: add i.e.
+        // Because there is no restriction that address 0 can rebaseOptOut, we always prevent it, no matter DOS_CHECK.
+        if (user == address(0)) {
+            console.log("OETH function: rebaseOptOut()  from: Skipped because: No user found");
+            return;
+        }
+
+        // RebaseOptOut
+        hevm.prank(user);
+        oeth.rebaseOptOut();
+
+        console.log("OETH function: rebaseOptOut()  from: %s", names[user]);
+    }
+
     //////////////////////////////////////////////////////
     /// --- HELPERS
     //////////////////////////////////////////////////////
@@ -154,9 +264,9 @@ abstract contract TargetFunctions is Properties {
     // - changeSupply() (done)
     //
     // --- Users Actions
-    // - transfer()
-    // - rebaseOptIn()
-    // - rebaseOptOut()
+    // - transfer() (done)
+    // - rebaseOptIn() (done)
+    // - rebaseOptOut() (done)
     //
     // --- Governance Actions
     // - delegateYield()

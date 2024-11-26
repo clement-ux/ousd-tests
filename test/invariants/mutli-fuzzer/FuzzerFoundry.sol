@@ -24,13 +24,26 @@ contract FuzzerFoundry is Test, TargetFunctions {
         targetContract(address(this));
 
         // Add selectors
-        bytes4[] memory selectors = new bytes4[](3);
+        bytes4[] memory selectors = new bytes4[](6);
         selectors[0] = this.handler_mint.selector;
         selectors[1] = this.handler_burn.selector;
         selectors[2] = this.handler_changeSupply.selector;
+        selectors[3] = this.handler_transfer.selector;
+        selectors[4] = this.handler_rebaseOptIn.selector;
+        selectors[5] = this.handler_rebaseOptOut.selector;
 
         // Target selectors
         targetSelector(FuzzSelector({addr: address(this), selectors: selectors}));
+
+        // Mint some OETH to dead address to avoid empty contract
+        vm.prank(address(vault));
+        oeth.mint(dead, 0.01 ether);
+
+        // Mint some OETH to rebaseOptOut dead2 address to avoid empty contract
+        vm.prank(address(vault));
+        oeth.mint(dead2, 0.01 ether);
+        vm.prank(dead2);
+        oeth.rebaseOptOut();
     }
 
     //////////////////////////////////////////////////////
