@@ -14,11 +14,13 @@ ignored_warnings_from = [
 [invariant]
 runs = 256
 depth = 500
+shrink_run_limit = 5000
+show_metrics = true
 fail_on_revert = true
 
 [dependencies]
 forge-std = "1.9.4"
-origin-dollar = { version = "1", git = "https://github.com/OriginProtocol/origin-dollar.git", rev = "dc7970116395447ae2b7f59be9bd57d060bad18a" } # master
+origin-dollar = { version = "1", git = "https://github.com/OriginProtocol/origin-dollar.git", rev = "dc7970116395447ae2b7f59be9bd57d060bad18a" }    # master
 origin-dollar-yd = { version = "1", git = "https://github.com/OriginProtocol/origin-dollar.git", rev = "53db807bfa802e7826d40ec55efdee964945829b" } # rebaseElsewhere_v2
 "@openzeppelin-contracts" = "4.2"
 
