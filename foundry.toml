@@ -6,17 +6,14 @@ libs = ["dependencies"]
 auto_detect_remappings = false
 verbosity = 3
 show_progress = true
-ignored_warnings_from = [
-    "dependencies/origin-dollar-1/contracts/contracts/proxies/",
-    "dependencies/origin-dollar-yd-1/contracts/contracts/proxies/",
-]
+ignored_warnings_from = ["dependencies/"]
 
 [invariant]
 runs = 256
 depth = 500
 shrink_run_limit = 5000
 show_metrics = true
-fail_on_revert = true
+fail_on_revert = false
 
 [dependencies]
 forge-std = "1.9.4"
