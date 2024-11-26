@@ -12,7 +12,7 @@ import {OETHProxy} from "origin/proxies/Proxies.sol";
 import {IVault} from "origin/interfaces/IVault.sol";
 
 /// @title Setup contract
-/// @notice Use to store all the setup logic and deploy the contracts.
+/// @notice Use to store all the global variable and deploy contracts.
 abstract contract Setup {
     //////////////////////////////////////////////////////
     /// --- VM
@@ -33,6 +33,7 @@ abstract contract Setup {
     /// --- GOVERNANCE, MS & EOAS
     //////////////////////////////////////////////////////
     address[] public users;
+    mapping(address => string) public names;
 
     // --- EOAs ---
     address public alice;
@@ -98,6 +99,16 @@ abstract contract Setup {
         users.push(dave);
         users.push(eve);
         users.push(frank);
+
+        // Add users to name mapping
+        names[alice] = "Alice";
+        names[bob] = "Bob";
+        names[charlie] = "Charlie";
+        names[dave] = "Dave";
+        names[eve] = "Eve";
+        names[frank] = "Frank";
+        names[dead] = "Dead";
+        names[dead2] = "Dead2";
     }
 
     function _deployContracts() private {
