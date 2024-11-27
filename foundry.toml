@@ -11,7 +11,7 @@ ignored_warnings_from = ["dependencies/"]
 [invariant]
 runs = 256
 depth = 500
-shrink_run_limit = 5000
+shrink_run_limit = 50_000
 show_metrics = true
 fail_on_revert = false
 
