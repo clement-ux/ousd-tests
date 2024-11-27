@@ -36,14 +36,14 @@ abstract contract Properties is Setup, StdUtils {
 
     // --- Rebasing invariants ---
     // Invariant : totalSupply >= nonRebasingCredits + (rebasingCredits / rebasingCreditsPerToken)
-    // Invariant : after calling changeSupply(newValue), totalSupply == newValue (checked in handlers)
+    // Invariant : When changeSupply(newValue), totalSupply == newValue (checked in handlers)
     // Invariant : ∀ user ∈ [rebaseState == StdNonRebasing || YieldDelegationSource], if transfer(amount) || mint(amount) || burn(amount) && amount != 0, balanceOfBefore(user) != balanceOfAfter(user) (checked in handlers)
 
     // --- Miscellaneous invariants ---
     // Invariant : ∀ user ∈ [rebaseState == StdRebasing], alternativeCreditsPerToken[user] == 0
-    // Invariant : after calling rebaseOptIn(), balanceBefore(user) == balanceAfter(user) (checked in handlers)
+    // Invariant : When rebaseOptIn(), balanceBefore(user) == balanceAfter(user) (checked in handlers)
     // Invariant : ∀ user ∈ [rebaseState == StdNonRebasing], alternativeCreditsPerToken[user] == 1e18
-    // Invariant : after calling rebaseOptOut(), balanceBefore(user) == balanceAfter(user) (checked in handlers)
+    // Invariant : When rebaseOptOut(), balanceBefore(user) == balanceAfter(user) (checked in handlers)
     // Invariant : When mint(to, amount), balanceBefore(to) + amount == balanceAfter(to) (checked in handlers)
     // Invariant : When burn(from, amount), balanceBefore(from) == balanceAfter(from) + amount (checked in handlers)
 
