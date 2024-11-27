@@ -47,6 +47,9 @@ abstract contract Properties is Setup, StdUtils {
     // Invariant : When mint(to, amount), balanceBefore(to) + amount == balanceAfter(to) (checked in handlers)
     // Invariant : When burn(from, amount), balanceBefore(from) == balanceAfter(from) + amount (checked in handlers)
 
+    //////////////////////////////////////////////////////
+    /// --- ACCOUNT INVARIANTS
+    //////////////////////////////////////////////////////
     function property_A() public view returns (bool) {
         uint256 len = users.length;
         for (uint256 i; i < len; i++) {
@@ -141,6 +144,9 @@ abstract contract Properties is Setup, StdUtils {
         return true;
     }
 
+    //////////////////////////////////////////////////////
+    /// --- BALANCE INVARIANTS
+    //////////////////////////////////////////////////////
     function property_balance_A() public view returns (bool) {}
 
     function property_balance_B() public pure returns (bool) {
@@ -202,5 +208,23 @@ abstract contract Properties is Setup, StdUtils {
         sum += creditBalance;
 
         return sum <= oeth.rebasingCredits();
+    }
+
+    //////////////////////////////////////////////////////
+    /// --- REBASING INVARIANTS
+    //////////////////////////////////////////////////////
+    function property_rebasing_A() public view returns (bool) {
+        return
+            oeth.totalSupply() >= oeth.nonRebasingSupply() + (oeth.rebasingCredits() / oeth.rebasingCreditsPerToken());
+    }
+
+    function property_rebasing_B() public pure returns (bool) {
+        // checked in handlers
+        return true;
+    }
+
+    function property_rebasing_C() public pure returns (bool) {
+        // checked in handlers
+        return true;
     }
 }

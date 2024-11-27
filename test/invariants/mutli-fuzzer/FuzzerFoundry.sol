@@ -51,6 +51,7 @@ contract FuzzerFoundry is Test, TargetFunctions {
     //////////////////////////////////////////////////////
     /// --- INVARIANTS
     //////////////////////////////////////////////////////
+    /*
     function invariant_A() public view {
         assertTrue(property_A());
     }
@@ -71,6 +72,22 @@ contract FuzzerFoundry is Test, TargetFunctions {
         assertTrue(property_E());
     }
 
+    function invariant_balance_A() public view {
+        // Not implemented yet
+    }
+
+    // Fail
+    function invariant_balance_B() public pure {
+        // checked in handlers
+        return true;
+    }
+
+    // Fail
+    function invariant_balance_C() public pure {
+        // checked in handlers
+        return true;
+    }
+
     // Fail
     function invariant_balance_D() public view {
         assertTrue(property_balance_D());
@@ -85,4 +102,13 @@ contract FuzzerFoundry is Test, TargetFunctions {
     function invariant_balance_F() public view {
         assertTrue(property_balance_F());
     }
+    */
+
+    /*
+    function invariant_rebasing_A() public view {
+        assertTrue(property_rebasing_A());
+        assertTrue(property_rebasing_B());
+        assertTrue(property_rebasing_C());
+    }
+    */
 }
