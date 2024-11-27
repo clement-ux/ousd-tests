@@ -42,16 +42,47 @@ contract FuzzerFoundry is Test, TargetFunctions {
         oeth.mint(dead, 0.01 ether);
 
         // Mint some OETH to rebaseOptOut dead2 address to avoid empty contract
-        vm.prank(address(vault));
-        oeth.mint(dead2, 0.01 ether);
         vm.prank(dead2);
         oeth.rebaseOptOut();
+        vm.prank(address(vault));
+        oeth.mint(dead2, 0.01 ether);
     }
 
     //////////////////////////////////////////////////////
     /// --- INVARIANTS
     //////////////////////////////////////////////////////
-    function invariant_A() public {
-        //assertTrue(property_A());
+    function invariant_A() public view {
+        assertTrue(property_A());
+    }
+
+    function invariant_B() public view {
+        assertTrue(property_B());
+    }
+
+    function invariant_C() public view {
+        assertTrue(property_C());
+    }
+
+    function invariant_D() public view {
+        assertTrue(property_D());
+    }
+
+    function invariant_E() public view {
+        assertTrue(property_E());
+    }
+
+    // Fail
+    function invariant_balance_D() public view {
+        assertTrue(property_balance_D());
+    }
+
+    // Fail
+    function invariant_balance_E() public view {
+        assertTrue(property_balance_E());
+    }
+
+    // Fail
+    function invariant_balance_F() public view {
+        assertTrue(property_balance_F());
     }
 }

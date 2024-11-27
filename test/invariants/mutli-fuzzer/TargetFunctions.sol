@@ -148,13 +148,13 @@ abstract contract TargetFunctions is Properties {
     function handler_transfer(uint8 _from, uint8 _to, uint96 _amount) public {
         // Select random user with balance > 0.
         address from;
-        uint256 balanceOf;
+        uint256 balanceOfBeforeFrom;
         uint256 len = users.length;
         for (uint256 i = _from; i < _from + len; i++) {
             uint256 balanceOf_ = oeth.balanceOf(users[i % len]);
             if (balanceOf_ > 0) {
                 from = users[i % len];
-                balanceOf = balanceOf_;
+                balanceOfBeforeFrom = balanceOf_;
                 break;
             }
         }
@@ -166,10 +166,11 @@ abstract contract TargetFunctions is Properties {
         }
 
         // This should be the only case where transfer can revert.
-        if (DOS_CHECK) _amount = uint96(_bound(_amount, 0, balanceOf));
+        if (DOS_CHECK) _amount = uint96(_bound(_amount, 0, balanceOfBeforeFrom));
 
         // User can send to himself.
         address to = users[_to % users.length];
+        uint256 balanceOfBeforeTo = oeth.balanceOf(to);
 
         hevm.prank(from);
         oeth.transfer(to, _amount);
@@ -177,6 +178,9 @@ abstract contract TargetFunctions is Properties {
         console.log(
             "OETH function: transfer() \t\t from: %s \t to: %s \t amount: %18e", names[from], names[to], _amount
         );
+
+        require(oeth.balanceOf(from) + _amount == balanceOfBeforeFrom, "Invariant: transfer(from, to, amount) failed");
+        require(oeth.balanceOf(to) == balanceOfBeforeTo + _amount, "Invariant: transfer(from, to, amount) failed");
     }
 
     /// @notice Handler to rebaseOptIn a random user.
