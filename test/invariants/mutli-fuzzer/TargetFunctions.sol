@@ -35,7 +35,7 @@ abstract contract TargetFunctions is Properties {
         address user = users[_account % users.length];
 
         if (oeth.totalSupply() + _amount >= MAX_SUPPLY && DOS_CHECK) {
-            console.log("OETH function: mint() \t from: Skipped because: Max supply reached");
+            console.log("OETH function: mint() \t\t skip: MSR");
             return;
         }
 
@@ -44,7 +44,7 @@ abstract contract TargetFunctions is Properties {
         oeth.mint(user, _amount);
 
         // Idea: use a color when the value is high.
-        console.log("OETH function: mint() \t from: %s \t to: %s \t amount: %18e", "Null", names[user], _amount);
+        console.log("OETH function: mint() \t\t from: %s \t to: %s \t amount: %18e", "Null", names[user], _amount);
     }
 
     /// @notice Handler to burn a random amount of OETH from a random user.
@@ -70,7 +70,7 @@ abstract contract TargetFunctions is Properties {
 
         // If no user found, Todo: add i.e.
         if (user == address(0)) {
-            console.log("OETH function: burn() \t from: Skipped because: No user found");
+            console.log("OETH function: burn() \t\t skip: NUF");
             // Todo: Maybe it could be interesting to try to jump into another handler instead of return.
             return;
         }
@@ -85,7 +85,7 @@ abstract contract TargetFunctions is Properties {
         oeth.burn(user, _amount);
 
         // Idea: use a color when the value is high.
-        console.log("OETH function: burn() \t from: %s \t to: %s \t amount: %18e", names[user], "Null", _amount);
+        console.log("OETH function: burn() \t\t from: %s \t to: %s \t amount: %18e", names[user], "Null", _amount);
     }
 
     /// @notice Handler to change the totalSupply of OETH.
@@ -100,13 +100,13 @@ abstract contract TargetFunctions is Properties {
         // If we are not checking DOS, we can let the require revert.
         // If totalSupply is null, require will revert.
         if (totalSupply == 0 && DOS_CHECK) {
-            console.log("OETH function: changeSupply() \t from: Skipped because totalSupply == 0");
+            console.log("OETH function: changeSupply() \t\t skip: TS=0"); // totalSupply null
             return;
         }
 
         // If totalSupply is equal to nonRebasingSupply, div will fail.
         if (min(oeth.totalSupply(), MAX_SUPPLY) == oeth.nonRebasingSupply() && DOS_CHECK) {
-            console.log("OETH function: changeSupply() \t from: Skipped because totalSupply == nonRebasingSupply");
+            console.log("OETH function: changeSupply() \t\t skip: TS=NRS"); // totalSupply == nonRebasingSupply
             return;
         }
 
@@ -115,15 +115,13 @@ abstract contract TargetFunctions is Properties {
             min(oeth.totalSupply(), MAX_SUPPLY) - oeth.nonRebasingSupply() > oeth.rebasingCreditsHighres() * 1e18
                 && DOS_CHECK
         ) {
-            console.log(
-                "OETH function: changeSupply() \t from: Skipped because totalSupply - nonRebasingSupply > rebasingCreditsHighres"
-            );
+            console.log("OETH function: changeSupply() \t\t skip: TS-NRS > RC"); // totalSupply - nonRebasingSupply > rebasingCreditsHighres
             return;
         }
 
         // If rebasingCredits_ == 0, rebasingCreditsPerToken_ will be 0 too and require will revert.
         if (oeth.rebasingCreditsHighres() == 0 && DOS_CHECK) {
-            console.log("OETH function: changeSupply() \t from: Skipped because rebasingCreditsHighres == 0");
+            console.log("OETH function: changeSupply() \t\t skip: RC=0"); // rebasingCreditsHighres == 0
             return;
         }
 
@@ -138,7 +136,7 @@ abstract contract TargetFunctions is Properties {
 
         // Idea: use a color when the percentage change is high.
         console.log(
-            "OETH function: changeSupply()  from: %18e \t to: %18e (%16e%)", totalSupply, newTotalSupply, _pctChange
+            "OETH function: changeSupply() \t from: %18e \t to: %18e (%16e%)", totalSupply, newTotalSupply, _pctChange
         );
     }
 
@@ -163,7 +161,7 @@ abstract contract TargetFunctions is Properties {
 
         // If no user found, i.e. no user have tokens.
         if (from == address(0)) {
-            console.log("OETH function: transfer() \t from: Skipped because: No user found");
+            console.log("OETH function: transfer() \t\t skip: NUF"); // No user found
             return;
         }
 
@@ -176,7 +174,9 @@ abstract contract TargetFunctions is Properties {
         hevm.prank(from);
         oeth.transfer(to, _amount);
 
-        console.log("OETH function: transfer() \t from: %s \t to: %s \t amount: %18e", names[from], names[to], _amount);
+        console.log(
+            "OETH function: transfer() \t\t from: %s \t to: %s \t amount: %18e", names[from], names[to], _amount
+        );
     }
 
     /// @notice Handler to rebaseOptIn a random user.
@@ -203,7 +203,7 @@ abstract contract TargetFunctions is Properties {
         // If no user found, Todo: add i.e.
         // Because there is no restriction that address 0 can rebaseOptIn, we always prevent it, no matter DOS_CHECK.
         if (user == address(0)) {
-            console.log("OETH function: rebaseOptIn() \t from: Skipped because: No user found");
+            console.log("OETH function: rebaseOptIn() \t\t skip: NUF"); // No user found
             return;
         }
 
@@ -211,7 +211,7 @@ abstract contract TargetFunctions is Properties {
         hevm.prank(user);
         oeth.rebaseOptIn();
 
-        console.log("OETH function: rebaseOptIn() \t from: %s", names[user]);
+        console.log("OETH function: rebaseOptIn() \t\t from: %s", names[user]);
     }
 
     /// @notice Handler to rebaseOptOut a random user.
@@ -238,7 +238,7 @@ abstract contract TargetFunctions is Properties {
         // If no user found, Todo: add i.e.
         // Because there is no restriction that address 0 can rebaseOptOut, we always prevent it, no matter DOS_CHECK.
         if (user == address(0)) {
-            console.log("OETH function: rebaseOptOut()  from: Skipped because: No user found");
+            console.log("OETH function: rebaseOptOut() \t skip: NUF"); // No user found.
             return;
         }
 
@@ -246,7 +246,93 @@ abstract contract TargetFunctions is Properties {
         hevm.prank(user);
         oeth.rebaseOptOut();
 
-        console.log("OETH function: rebaseOptOut()  from: %s", names[user]);
+        console.log("OETH function: rebaseOptOut() \t from: %s", names[user]);
+    }
+
+    /// @notice Handler to delegateYield a random user to another random user.
+    /// @param _from The index of the user to delegateYield from.
+    /// @param _to The index of the user to delegateYield to.
+    function handler_delegateYield(uint8 _from, uint8 _to) public {
+        // Select a pair of 2 different users.
+        address from;
+        address to;
+        uint256 len = users.length;
+        for (uint256 i = _from; i < _from + len; i++) {
+            address from_ = users[i % len];
+
+            for (uint256 j = _to; j < _to + len; j++) {
+                address to_ = users[j % len];
+                // Condition 1).
+                if (from_ != to_) {
+                    // Condition 2).
+                    if (
+                        oeth.yieldFrom(to_) == address(0) && oeth.yieldTo(to_) == address(0)
+                            && oeth.yieldFrom(from_) == address(0) && oeth.yieldTo(from_) == address(0)
+                    ) {
+                        // Condition 3).
+                        if (
+                            oeth.rebaseState(from_) == OUSD.RebaseOptions.NotSet
+                                || oeth.rebaseState(from_) == OUSD.RebaseOptions.StdNonRebasing
+                                || oeth.rebaseState(from_) == OUSD.RebaseOptions.StdRebasing
+                        ) {
+                            // Conditon 4).
+                            if (
+                                oeth.rebaseState(to_) == OUSD.RebaseOptions.NotSet
+                                    || oeth.rebaseState(to_) == OUSD.RebaseOptions.StdNonRebasing
+                                    || oeth.rebaseState(to_) == OUSD.RebaseOptions.StdRebasing
+                            ) {
+                                from = from_;
+                                to = to_;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (from != address(0) && to != address(0)) {
+                break;
+            }
+        }
+
+        // If no user found, Todo: add i.e.
+        if ((from == address(0) || to == address(0)) && DOS_CHECK) {
+            console.log("OETH function: delegateYield() \t skip: NUF"); // No user found.
+            return;
+        }
+
+        // Delegate yield
+        hevm.prank(governor);
+        oeth.delegateYield(from, to);
+
+        console.log("OETH function: delegateYield() \t from: %s \t to: %s", names[from], names[to]);
+    }
+
+    /// @notice Handler to undelegateYield a random user.
+    /// @param _from The index of the user to undelegateYield from.
+    function handler_undelegateYield(uint8 _from) public {
+        // Select a random user that matcch requirements.
+        address from;
+        uint256 len = users.length;
+        for (uint256 i = _from; i < _from + len; i++) {
+            address from_ = users[i % len];
+            if (oeth.yieldTo(from_) != address(0)) {
+                from = from_;
+                break;
+            }
+        }
+
+        // If no user found, Todo: add i.e.
+        if (from == address(0) && DOS_CHECK) {
+            console.log("OETH function: undelegateYield() \t skip: NUF"); // No user found.
+            return;
+        }
+
+        // Undelegate yield
+        hevm.prank(governor);
+        oeth.undelegateYield(from);
+
+        console.log("OETH function: undelegateYield() \t from: %s", names[from]);
     }
 
     //////////////////////////////////////////////////////
@@ -269,6 +355,6 @@ abstract contract TargetFunctions is Properties {
     // - rebaseOptOut() (done)
     //
     // --- Governance Actions
-    // - delegateYield()
-    // - undelegateYield()
+    // - delegateYield() (done)
+    // - undelegateYield() (done)
 }

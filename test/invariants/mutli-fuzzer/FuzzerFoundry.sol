@@ -24,13 +24,15 @@ contract FuzzerFoundry is Test, TargetFunctions {
         targetContract(address(this));
 
         // Add selectors
-        bytes4[] memory selectors = new bytes4[](6);
+        bytes4[] memory selectors = new bytes4[](8);
         selectors[0] = this.handler_mint.selector;
         selectors[1] = this.handler_burn.selector;
         selectors[2] = this.handler_changeSupply.selector;
         selectors[3] = this.handler_transfer.selector;
         selectors[4] = this.handler_rebaseOptIn.selector;
         selectors[5] = this.handler_rebaseOptOut.selector;
+        selectors[6] = this.handler_delegateYield.selector;
+        selectors[7] = this.handler_undelegateYield.selector;
 
         // Target selectors
         targetSelector(FuzzSelector({addr: address(this), selectors: selectors}));
