@@ -57,6 +57,8 @@ abstract contract TargetFunctions is Properties {
         ) {
             require(oeth.balanceOf(user) > balanceBefore, "Invariant: Todo: Add name");
         }
+        // Failing invariant
+        //require(balanceBefore + _amount == oeth.balanceOf(user), "Invariant: mint() failed");
     }
 
     /// @notice Handler to burn a random amount of OETH from a random user.
@@ -107,6 +109,8 @@ abstract contract TargetFunctions is Properties {
         ) {
             require(oeth.balanceOf(user) < balanceOf, "Invariant: Todo: Add name");
         }
+        // Failing invariant
+        //require(balanceOf == oeth.balanceOf(user) + _amount, "Invariant: burn() failed");
     }
 
     /// @notice Handler to change the totalSupply of OETH.
@@ -264,11 +268,18 @@ abstract contract TargetFunctions is Properties {
             return;
         }
 
+        // Cache balance before rebaseOptIn.
+        uint256 balanceBefore = oeth.balanceOf(user);
+
         // RebaseOptIn
         hevm.prank(user);
         oeth.rebaseOptIn();
 
         console.log("OETH function: rebaseOptIn() \t\t from: %s", names[user]);
+
+        // Invariant check
+        // Failling invariant
+        //require(oeth.balanceOf(user) == balanceBefore, "Invariant: rebaseOptIn() failed");
     }
 
     /// @notice Handler to rebaseOptOut a random user.
@@ -299,11 +310,17 @@ abstract contract TargetFunctions is Properties {
             return;
         }
 
+        // Cache balance before rebaseOptOut.
+        uint256 balanceBefore = oeth.balanceOf(user);
+
         // RebaseOptOut
         hevm.prank(user);
         oeth.rebaseOptOut();
 
         console.log("OETH function: rebaseOptOut() \t from: %s", names[user]);
+
+        // Invariant check
+        require(oeth.balanceOf(user) == balanceBefore, "Invariant: rebaseOptOut() failed");
     }
 
     /// @notice Handler to delegateYield a random user to another random user.

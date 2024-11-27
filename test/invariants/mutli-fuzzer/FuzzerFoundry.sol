@@ -102,13 +102,23 @@ contract FuzzerFoundry is Test, TargetFunctions {
     function invariant_balance_F() public view {
         assertTrue(property_balance_F());
     }
-    */
 
-    /*
     function invariant_rebasing_A() public view {
         assertTrue(property_rebasing_A());
         assertTrue(property_rebasing_B());
         assertTrue(property_rebasing_C());
+    }
+
+    function invariant_other_A_B_E_F() public view {
+        assertTrue(property_other_A());
+        assertTrue(property_other_B()); // Fail
+        assertTrue(property_other_E()); // Fail
+        assertTrue(property_other_F()); // Fail
+    }
+
+    function invariant_other_C_D() public view {
+        assertTrue(property_other_C());
+        assertTrue(property_other_D());
     }
     */
 }

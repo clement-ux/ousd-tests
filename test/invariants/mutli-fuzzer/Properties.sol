@@ -39,7 +39,7 @@ abstract contract Properties is Setup, StdUtils {
     // Invariant : after calling changeSupply(newValue), totalSupply == newValue (checked in handlers)
     // Invariant : ∀ user ∈ [rebaseState == StdNonRebasing || YieldDelegationSource], if transfer(amount) || mint(amount) || burn(amount) && amount != 0, balanceOfBefore(user) != balanceOfAfter(user) (checked in handlers)
 
-    // --- Other invariants ---
+    // --- Miscellaneous invariants ---
     // Invariant : ∀ user ∈ [rebaseState == StdRebasing], alternativeCreditsPerToken[user] == 0
     // Invariant : after calling rebaseOptIn(), balanceBefore(user) == balanceAfter(user) (checked in handlers)
     // Invariant : ∀ user ∈ [rebaseState == StdNonRebasing], alternativeCreditsPerToken[user] == 1e18
@@ -224,6 +224,63 @@ abstract contract Properties is Setup, StdUtils {
     }
 
     function property_rebasing_C() public pure returns (bool) {
+        // checked in handlers
+        return true;
+    }
+
+    //////////////////////////////////////////////////////
+    /// --- MISCALLANEOUS INVARIANTS
+    //////////////////////////////////////////////////////
+    function property_other_A() public view returns (bool) {
+        uint256 len = users.length;
+        for (uint256 i; i < len; i++) {
+            address user_ = users[i];
+
+            if (oeth.rebaseState(user_) == OUSD.RebaseOptions.StdRebasing) {
+                if (oeth.nonRebasingCreditsPerToken(user_) == 0) {
+                    continue;
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    function property_other_B() public pure returns (bool) {
+        // checked in handlers
+        return true;
+    }
+
+    function property_other_C() public view returns (bool) {
+        uint256 len = users.length;
+        for (uint256 i; i < len; i++) {
+            address user_ = users[i];
+
+            if (oeth.rebaseState(user_) == OUSD.RebaseOptions.StdNonRebasing) {
+                if (oeth.nonRebasingCreditsPerToken(user_) == 1e18) {
+                    continue;
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    function property_other_D() public pure returns (bool) {
+        // checked in handlers
+        return true;
+    }
+
+    function property_other_E() public pure returns (bool) {
+        // checked in handlers
+        return true;
+    }
+
+    function property_other_F() public pure returns (bool) {
         // checked in handlers
         return true;
     }
