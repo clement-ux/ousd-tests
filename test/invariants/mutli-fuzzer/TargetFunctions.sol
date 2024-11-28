@@ -49,16 +49,8 @@ abstract contract TargetFunctions is Properties {
         // Idea: use a color when the value is high.
         console.log("OETH function: mint() \t\t from: %s \t to: %s \t amount: %18e", "Null", names[user], _amount);
 
-        // Invariant check
-        OUSD.RebaseOptions state = oeth.rebaseState(user);
-        if (
-            _amount != 0
-                && (state == OUSD.RebaseOptions.StdNonRebasing || state == OUSD.RebaseOptions.YieldDelegationSource)
-        ) {
-            require(oeth.balanceOf(user) > balanceBefore, "Invariant: Todo: Add name");
-        }
-        // Failing invariant
-        //require(balanceBefore + _amount == oeth.balanceOf(user), "Invariant: mint() failed");
+        // Update ghost
+        if (balanceBefore + _amount != oeth.balanceOf(user)) ghost_mi_E = false;
     }
 
     /// @notice Handler to burn a random amount of OETH from a random user.
@@ -101,16 +93,8 @@ abstract contract TargetFunctions is Properties {
         // Idea: use a color when the value is high.
         console.log("OETH function: burn() \t\t from: %s \t to: %s \t amount: %18e", names[user], "Null", _amount);
 
-        // Invariant check
-        OUSD.RebaseOptions state = oeth.rebaseState(user);
-        if (
-            _amount != 0
-                && (state == OUSD.RebaseOptions.StdNonRebasing || state == OUSD.RebaseOptions.YieldDelegationSource)
-        ) {
-            require(oeth.balanceOf(user) < balanceOf, "Invariant: Todo: Add name");
-        }
-        // Failing invariant
-        //require(balanceOf == oeth.balanceOf(user) + _amount, "Invariant: burn() failed");
+        // Update ghost
+        if (balanceOf != oeth.balanceOf(user) + _amount) ghost_mi_F = false;
     }
 
     /// @notice Handler to change the totalSupply of OETH.
@@ -164,8 +148,8 @@ abstract contract TargetFunctions is Properties {
             "OETH function: changeSupply() \t from: %18e \t to: %18e (%16e%)", totalSupply, newTotalSupply, _pctChange
         );
 
-        // Invariant check
-        require(oeth.totalSupply() == min(newTotalSupply, MAX_SUPPLY), "Invariant: changeSupply() failed");
+        // Update ghost
+        if (oeth.totalSupply() != min(newTotalSupply, MAX_SUPPLY)) ghost_ri_B = false;
     }
 
     /// @notice Handler to transfer a random amount of OETH from a random user to another random user.
@@ -207,36 +191,12 @@ abstract contract TargetFunctions is Properties {
             "OETH function: transfer() \t\t from: %s \t to: %s \t amount: %18e", names[from], names[to], _amount
         );
 
-        // Invariant check
-        /*
-        Failing invariant
+        // Update ghost
         if (from != to) {
-            require(
-                oeth.balanceOf(from) + _amount == balanceOfBeforeFrom,
-                "Invariant: transfer(from, to, amount) failed: from"
-            );
-            require(
-                oeth.balanceOf(to) == balanceOfBeforeTo + _amount, "Invariant: transfer(from, to, amount) failed: to"
-            );
+            ghost_bi_B = oeth.balanceOf(from) + _amount == balanceOfBeforeFrom;
+            ghost_bi_C = oeth.balanceOf(to) == balanceOfBeforeTo + _amount;
         } else {
-            require(oeth.balanceOf(from) == balanceOfBeforeFrom, "Invariant: transfer(from, to, amount) failed");
-        }
-        */
-
-        OUSD.RebaseOptions stateFrom = oeth.rebaseState(from);
-        OUSD.RebaseOptions stateTo = oeth.rebaseState(to);
-        if (_amount != 0 && from != to) {
-            if (
-                (
-                    stateFrom == OUSD.RebaseOptions.StdNonRebasing
-                        || stateFrom == OUSD.RebaseOptions.YieldDelegationSource
-                )
-            ) {
-                require(oeth.balanceOf(from) < balanceOfBeforeFrom, "Invariant: Todo: Add name");
-            }
-            if ((stateTo == OUSD.RebaseOptions.StdNonRebasing || stateTo == OUSD.RebaseOptions.YieldDelegationSource)) {
-                require(oeth.balanceOf(to) > balanceOfBeforeTo, "Invariant: Todo: Add name");
-            }
+            ghost_bi_B = oeth.balanceOf(from) == balanceOfBeforeFrom;
         }
     }
 
@@ -277,9 +237,8 @@ abstract contract TargetFunctions is Properties {
 
         console.log("OETH function: rebaseOptIn() \t\t from: %s", names[user]);
 
-        // Invariant check
-        // Failling invariant
-        //require(oeth.balanceOf(user) == balanceBefore, "Invariant: rebaseOptIn() failed");
+        // Update ghost
+        if (oeth.balanceOf(user) != balanceBefore) ghost_ri_B = false;
     }
 
     /// @notice Handler to rebaseOptOut a random user.
@@ -319,8 +278,8 @@ abstract contract TargetFunctions is Properties {
 
         console.log("OETH function: rebaseOptOut() \t from: %s", names[user]);
 
-        // Invariant check
-        require(oeth.balanceOf(user) == balanceBefore, "Invariant: rebaseOptOut() failed");
+        // Update ghost
+        if (oeth.balanceOf(user) != balanceBefore) ghost_mi_D = false;
     }
 
     /// @notice Handler to delegateYield a random user to another random user.

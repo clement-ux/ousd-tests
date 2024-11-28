@@ -49,56 +49,56 @@ contract FuzzerFoundry is Test, TargetFunctions {
     }
 
     //////////////////////////////////////////////////////
-    /// --- INVARIANTS
+    /// --- ACCOUNT INVARIANTS
     //////////////////////////////////////////////////////
-    /*
-    function invariant_A() public view {
-        assertTrue(property_A());
+    function invariant_account_A() public view {
+        assertTrue(property_account_A());
     }
 
     function invariant_B() public view {
-        assertTrue(property_B());
+        assertTrue(property_account_B());
     }
 
     function invariant_C() public view {
-        assertTrue(property_C());
+        assertTrue(property_account_C());
     }
 
     function invariant_D() public view {
-        assertTrue(property_D());
+        assertTrue(property_account_D());
     }
 
     function invariant_E() public view {
-        assertTrue(property_E());
+        assertTrue(property_account_E());
     }
 
+    //////////////////////////////////////////////////////
+    /// --- BALANCE INVARIANTS
+    //////////////////////////////////////////////////////
     function invariant_balance_A() public view {
         // Not implemented yet
     }
 
-    // Fail
-    function invariant_balance_B() public pure {
-        // checked in handlers
-        return true;
+    // Failling
+    function invariant_balance_B() public view {
+        assertTrue(property_balance_B());
     }
 
-    // Fail
-    function invariant_balance_C() public pure {
-        // checked in handlers
-        return true;
+    // Failling
+    function invariant_balance_C() public view {
+        assertTrue(property_balance_C());
     }
 
-    // Fail
+    // Failling
     function invariant_balance_D() public view {
         assertTrue(property_balance_D());
     }
 
-    // Fail
+    // Failling
     function invariant_balance_E() public view {
         assertTrue(property_balance_E());
     }
 
-    // Fail
+    // Failling
     function invariant_balance_F() public view {
         assertTrue(property_balance_F());
     }
@@ -107,22 +107,26 @@ contract FuzzerFoundry is Test, TargetFunctions {
         // Not implemented yet
     }
 
+    //////////////////////////////////////////////////////
+    /// --- REBASING INVARIANTS
+    //////////////////////////////////////////////////////
     function invariant_rebasing_A() public view {
         assertTrue(property_rebasing_A());
         assertTrue(property_rebasing_B());
-        assertTrue(property_rebasing_C());
     }
 
-    function invariant_other_A_B_E_F() public view {
-        assertTrue(property_other_A());
-        assertTrue(property_other_B()); // Fail
-        assertTrue(property_other_E()); // Fail
-        assertTrue(property_other_F()); // Fail
+    //////////////////////////////////////////////////////
+    /// --- MISCALLANEOUS INVARIANTS
+    //////////////////////////////////////////////////////
+    function invariant_miscallaneous_A_B_E_F() public view {
+        assertTrue(property_miscallaneous_A());
+        assertTrue(property_miscallaneous_B()); // Failling
+        assertTrue(property_miscallaneous_E()); // Failling
+        assertTrue(property_miscallaneous_F()); // Failling
     }
 
-    function invariant_other_C_D() public view {
-        assertTrue(property_other_C());
-        assertTrue(property_other_D());
+    function invariant_miscallaneous_C_D() public view {
+        assertTrue(property_miscallaneous_C());
+        assertTrue(property_miscallaneous_D());
     }
-    */
 }

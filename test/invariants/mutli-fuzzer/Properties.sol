@@ -14,6 +14,17 @@ import {OUSD} from "origin/token/OUSD.sol";
 /// @notice Use to store all the properties (invariants) of the system.
 abstract contract Properties is Setup, StdUtils {
     //////////////////////////////////////////////////////
+    /// --- GHOST VARIABLES
+    //////////////////////////////////////////////////////
+    bool public ghost_bi_B = true;
+    bool public ghost_bi_C = true;
+    bool public ghost_ri_B = true;
+    bool public ghost_mi_B = true;
+    bool public ghost_mi_D = true;
+    bool public ghost_mi_E = true;
+    bool public ghost_mi_F = true;
+
+    //////////////////////////////////////////////////////
     /// --- PROPERTIES
     //////////////////////////////////////////////////////
 
@@ -38,6 +49,7 @@ abstract contract Properties is Setup, StdUtils {
     // Invariant A: totalSupply >= nonRebasingCredits + (rebasingCredits / rebasingCreditsPerToken)
     // Invariant B: When changeSupply(newValue), totalSupply == newValue (checked in handlers)
     // Invariant C: ∀ user ∈ [rebaseState == StdNonRebasing || YieldDelegationSource], if transfer(amount) || mint(amount) || burn(amount) && amount != 0, balanceOfBefore(user) != balanceOfAfter(user) (checked in handlers)
+    // Note for Invariant C: This is already checked with Balance Invariant B_C and Miscallaneous Invariant E_F, so I will not implement it here.
 
     // --- Miscellaneous invariants ---
     // Invariant A: ∀ user ∈ [rebaseState == StdRebasing], alternativeCreditsPerToken[user] == 0
@@ -50,7 +62,7 @@ abstract contract Properties is Setup, StdUtils {
     //////////////////////////////////////////////////////
     /// --- ACCOUNT INVARIANTS
     //////////////////////////////////////////////////////
-    function property_A() public view returns (bool) {
+    function property_account_A() public view returns (bool) {
         uint256 len = users.length;
         for (uint256 i; i < len; i++) {
             address user_ = users[i];
@@ -72,7 +84,7 @@ abstract contract Properties is Setup, StdUtils {
         return true;
     }
 
-    function property_B() public view returns (bool) {
+    function property_account_B() public view returns (bool) {
         uint256 len = users.length;
         for (uint256 i; i < len; i++) {
             address user_ = users[i];
@@ -91,7 +103,7 @@ abstract contract Properties is Setup, StdUtils {
         return true;
     }
 
-    function property_C() public view returns (bool) {
+    function property_account_C() public view returns (bool) {
         uint256 len = users.length;
         for (uint256 i; i < len; i++) {
             address user_ = users[i];
@@ -104,7 +116,7 @@ abstract contract Properties is Setup, StdUtils {
         return true;
     }
 
-    function property_D() public view returns (bool) {
+    function property_account_D() public view returns (bool) {
         uint256 len = users.length;
         for (uint256 i; i < len; i++) {
             address user_ = users[i];
@@ -127,7 +139,7 @@ abstract contract Properties is Setup, StdUtils {
         return true;
     }
 
-    function property_E() public view returns (bool) {
+    function property_account_E() public view returns (bool) {
         uint256 len = users.length;
         for (uint256 i; i < len; i++) {
             address user_ = users[i];
@@ -149,14 +161,12 @@ abstract contract Properties is Setup, StdUtils {
     //////////////////////////////////////////////////////
     function property_balance_A() public view returns (bool) {}
 
-    function property_balance_B() public pure returns (bool) {
-        // checked in handlers
-        return true;
+    function property_balance_B() public view returns (bool) {
+        return ghost_bi_B;
     }
 
-    function property_balance_C() public pure returns (bool) {
-        // checked in handlers
-        return true;
+    function property_balance_C() public view returns (bool) {
+        return ghost_bi_C;
     }
 
     function property_balance_D() public view returns (bool) {
@@ -218,20 +228,14 @@ abstract contract Properties is Setup, StdUtils {
             oeth.totalSupply() >= oeth.nonRebasingSupply() + (oeth.rebasingCredits() / oeth.rebasingCreditsPerToken());
     }
 
-    function property_rebasing_B() public pure returns (bool) {
-        // checked in handlers
-        return true;
-    }
-
-    function property_rebasing_C() public pure returns (bool) {
-        // checked in handlers
-        return true;
+    function property_rebasing_B() public view returns (bool) {
+        return ghost_ri_B;
     }
 
     //////////////////////////////////////////////////////
     /// --- MISCALLANEOUS INVARIANTS
     //////////////////////////////////////////////////////
-    function property_other_A() public view returns (bool) {
+    function property_miscallaneous_A() public view returns (bool) {
         uint256 len = users.length;
         for (uint256 i; i < len; i++) {
             address user_ = users[i];
@@ -248,12 +252,11 @@ abstract contract Properties is Setup, StdUtils {
         return true;
     }
 
-    function property_other_B() public pure returns (bool) {
-        // checked in handlers
-        return true;
+    function property_miscallaneous_B() public view returns (bool) {
+        return ghost_mi_B;
     }
 
-    function property_other_C() public view returns (bool) {
+    function property_miscallaneous_C() public view returns (bool) {
         uint256 len = users.length;
         for (uint256 i; i < len; i++) {
             address user_ = users[i];
@@ -270,18 +273,15 @@ abstract contract Properties is Setup, StdUtils {
         return true;
     }
 
-    function property_other_D() public pure returns (bool) {
-        // checked in handlers
-        return true;
+    function property_miscallaneous_D() public view returns (bool) {
+        return ghost_mi_D;
     }
 
-    function property_other_E() public pure returns (bool) {
-        // checked in handlers
-        return true;
+    function property_miscallaneous_E() public view returns (bool) {
+        return ghost_mi_E;
     }
 
-    function property_other_F() public pure returns (bool) {
-        // checked in handlers
-        return true;
+    function property_miscallaneous_F() public view returns (bool) {
+        return ghost_mi_F;
     }
 }
