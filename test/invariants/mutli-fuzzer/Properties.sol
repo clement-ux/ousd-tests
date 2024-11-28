@@ -217,7 +217,7 @@ abstract contract Properties is Setup, StdUtils {
         (uint256 creditBalance,,) = oeth.creditsBalanceOfHighres(dead);
         sum += creditBalance;
 
-        return sum <= oeth.rebasingCredits();
+        return sum <= oeth.rebasingCreditsHighres();
     }
 
     //////////////////////////////////////////////////////
