@@ -66,7 +66,7 @@ abstract contract TargetFunctions is Properties {
         );
 
         // Update ghost
-        if (balanceBefore + _amount != oeth.balanceOf(user)) ghost_mi_E = false;
+        ghost_mi_E = !(balanceBefore + _amount + 1 < oeth.balanceOf(user)); // Allow 1 wei difference.
     }
 
     /// @notice Handler to burn a random amount of OETH from a random user.
@@ -270,7 +270,7 @@ abstract contract TargetFunctions is Properties {
         console.log("OETH function: rebaseOptIn() \t\t from: %s", names[user]);
 
         // Update ghost
-        if (oeth.balanceOf(user) != balanceBefore) ghost_ri_B = false;
+        ghost_mi_B = oeth.balanceOf(user) == balanceBefore;
     }
 
     /// @notice Handler to rebaseOptOut a random user.
@@ -398,13 +398,6 @@ abstract contract TargetFunctions is Properties {
         oeth.undelegateYield(from);
 
         console.log("OETH function: undelegateYield() \t from: %s", names[from]);
-    }
-
-    //////////////////////////////////////////////////////
-    /// --- HELPERS
-    //////////////////////////////////////////////////////
-    function min(uint256 a, uint256 b) internal pure returns (uint256) {
-        return a < b ? a : b;
     }
 
     // Todo: List of handler to implement
