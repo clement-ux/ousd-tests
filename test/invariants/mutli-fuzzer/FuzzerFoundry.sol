@@ -134,7 +134,14 @@ contract FuzzerFoundry is Test, TargetFunctions {
         // But credits are rounded-up, which increase balanceOf when user rebaseOptIn.
         // How to solve it?
         // Round-down credits in _balanceToRebasingCredits, but is it really a problem?
-        assertTrue(property_miscallaneous_E()); // Failling
+
+        assertTrue(property_miscallaneous_E());
+        // This invariant is failling because:
+        // When mint is called, _balanceToRebasingCredits calculs user credits.
+        // But credits are rounded-up, which increase the previous balanceOf too.
+        // How to solve it?
+        // Round-down credits in _balanceToRebasingCredits, but it leaves room for 1 wei of error.
+        
         assertTrue(property_miscallaneous_F()); // Failling
     }
 
