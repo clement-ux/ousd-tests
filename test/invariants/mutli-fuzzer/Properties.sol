@@ -18,34 +18,34 @@ abstract contract Properties is Setup, StdUtils {
     //////////////////////////////////////////////////////
 
     // --- Account invariants ---
-    // Invariant : ∀ user ∈ [alternativeCreditsPerToken == 0]   , rebaseState == NotSet || StdRebasing || YieldDelegationTarget
-    // Invariant : ∀ user ∈ [alternativeCreditsPerToken == 1e18], rebaseState == StdNonRebasing || YieldDelegationSource
-    // Invariant : ∀ user, alternativeCreditsPerToken == 0 || 1e18 (and no other possible value)
-    // Invariant : ∀ user ∈ [rebaseState == YieldDelegationSource], yieldTo[user]   != address(0)
-    // Invariant : ∀ user ∈ [rebaseState == YieldDelegationTarget], yieldFrom[user] != address(0)
-    // Invariant : ∀ yieldFrom[user] != address(0), yieldTo[yieldFrom[user]] == user
+    // Invariant A: ∀ user ∈ [alternativeCreditsPerToken == 0]   , rebaseState == NotSet || StdRebasing || YieldDelegationTarget
+    // Invariant B: ∀ user ∈ [alternativeCreditsPerToken == 1e18], rebaseState == StdNonRebasing || YieldDelegationSource
+    // Invariant C: ∀ user, alternativeCreditsPerToken == 0 || 1e18 (and no other possible value)
+    // Invariant D: ∀ user ∈ [rebaseState == YieldDelegationSource], yieldTo[user]   != address(0)
+    // Invariant E: ∀ user ∈ [rebaseState == YieldDelegationTarget], yieldFrom[user] != address(0)
+    // Invariant F: ∀ yieldFrom[user] != address(0), yieldTo[yieldFrom[user]] == user
 
     // --- Balance invariants ---
-    // Invariant :
-    // Invariant : When transfer(from, to, amount), balanceBefore(from) == balanceAfter(from) + amount (checked in handlers)
-    // Invariant : When transfer(from, to, amount), balanceBefore(to) + amount == balanceAfter(to) (checked in handlers)
-    // Invariant : ∀ user, ∑balanceOf(user) <= totalSupply
-    // Invariant : ∀ user ∈ [rebaseState == StdNonRebasing], ∑balanceOf(user) == nonRebasingSupply
-    // Invariant : ∀ user ∈ [rebaseState == NotSet || StdRebasing || YieldDelegationTarget], ∑creditBalances(user) == rebasingCredits
-    // Invariant : ∀ user, balanceOf(user) == _creditBalances[account] * (alternativeCreditsPerToken[account] > 0 ? alternativeCreditsPerToken[account] : _rebasingCreditsPerToken) - (yieldFrom[account] == 0 ? 0 : _creditBalances[yieldFrom[account]])
+    // Invariant A:
+    // Invariant B: When transfer(from, to, amount), balanceBefore(from) == balanceAfter(from) + amount (checked in handlers)
+    // Invariant C: When transfer(from, to, amount), balanceBefore(to) + amount == balanceAfter(to) (checked in handlers)
+    // Invariant D: ∀ user, ∑balanceOf(user) <= totalSupply
+    // Invariant E: ∀ user ∈ [rebaseState == StdNonRebasing], ∑balanceOf(user) == nonRebasingSupply
+    // Invariant F: ∀ user ∈ [rebaseState == NotSet || StdRebasing || YieldDelegationTarget], ∑creditBalances(user) == rebasingCredits
+    // Invariant G: ∀ user, balanceOf(user) == _creditBalances[account] * (alternativeCreditsPerToken[account] > 0 ? alternativeCreditsPerToken[account] : _rebasingCreditsPerToken) - (yieldFrom[account] == 0 ? 0 : _creditBalances[yieldFrom[account]])
 
     // --- Rebasing invariants ---
-    // Invariant : totalSupply >= nonRebasingCredits + (rebasingCredits / rebasingCreditsPerToken)
-    // Invariant : When changeSupply(newValue), totalSupply == newValue (checked in handlers)
-    // Invariant : ∀ user ∈ [rebaseState == StdNonRebasing || YieldDelegationSource], if transfer(amount) || mint(amount) || burn(amount) && amount != 0, balanceOfBefore(user) != balanceOfAfter(user) (checked in handlers)
+    // Invariant A: totalSupply >= nonRebasingCredits + (rebasingCredits / rebasingCreditsPerToken)
+    // Invariant B: When changeSupply(newValue), totalSupply == newValue (checked in handlers)
+    // Invariant C: ∀ user ∈ [rebaseState == StdNonRebasing || YieldDelegationSource], if transfer(amount) || mint(amount) || burn(amount) && amount != 0, balanceOfBefore(user) != balanceOfAfter(user) (checked in handlers)
 
     // --- Miscellaneous invariants ---
-    // Invariant : ∀ user ∈ [rebaseState == StdRebasing], alternativeCreditsPerToken[user] == 0
-    // Invariant : When rebaseOptIn(), balanceBefore(user) == balanceAfter(user) (checked in handlers)
-    // Invariant : ∀ user ∈ [rebaseState == StdNonRebasing], alternativeCreditsPerToken[user] == 1e18
-    // Invariant : When rebaseOptOut(), balanceBefore(user) == balanceAfter(user) (checked in handlers)
-    // Invariant : When mint(to, amount), balanceBefore(to) + amount == balanceAfter(to) (checked in handlers)
-    // Invariant : When burn(from, amount), balanceBefore(from) == balanceAfter(from) + amount (checked in handlers)
+    // Invariant A: ∀ user ∈ [rebaseState == StdRebasing], alternativeCreditsPerToken[user] == 0
+    // Invariant B: When rebaseOptIn(), balanceBefore(user) == balanceAfter(user) (checked in handlers)
+    // Invariant C: ∀ user ∈ [rebaseState == StdNonRebasing], alternativeCreditsPerToken[user] == 1e18
+    // Invariant D: When rebaseOptOut(), balanceBefore(user) == balanceAfter(user) (checked in handlers)
+    // Invariant E: When mint(to, amount), balanceBefore(to) + amount == balanceAfter(to) (checked in handlers)
+    // Invariant F: When burn(from, amount), balanceBefore(from) == balanceAfter(from) + amount (checked in handlers)
 
     //////////////////////////////////////////////////////
     /// --- ACCOUNT INVARIANTS
