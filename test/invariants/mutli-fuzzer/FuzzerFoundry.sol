@@ -55,19 +55,19 @@ contract FuzzerFoundry is Test, TargetFunctions {
         assertTrue(property_account_A());
     }
 
-    function invariant_B() public view {
+    function invariant_account_B() public view {
         assertTrue(property_account_B());
     }
 
-    function invariant_C() public view {
+    function invariant_account_C() public view {
         assertTrue(property_account_C());
     }
 
-    function invariant_D() public view {
+    function invariant_account_D() public view {
         assertTrue(property_account_D());
     }
 
-    function invariant_E() public view {
+    function invariant_account_E() public view {
         assertTrue(property_account_E());
     }
 
@@ -91,6 +91,13 @@ contract FuzzerFoundry is Test, TargetFunctions {
     // Failling
     function invariant_balance_D() public view {
         assertTrue(property_balance_D());
+        // This invariant is failling because:
+        // When changeSupply is called, rebasingCreditsPerToken_ is rounded-down.
+        // Then balanceOf is over-estimtaed.
+        // How to solve it?
+        // rebasingCreditsPerToken_ =
+        //     ((rebasingCredits_ * 1e18 + (totalSupply - nonRebasingSupply - 1)) /
+        //     (totalSupply - nonRebasingSupply);
     }
 
     // Failling
@@ -120,7 +127,13 @@ contract FuzzerFoundry is Test, TargetFunctions {
     //////////////////////////////////////////////////////
     function invariant_miscallaneous_A_B_E_F() public view {
         assertTrue(property_miscallaneous_A());
-        assertTrue(property_miscallaneous_B()); // Failling
+
+        assertTrue(property_miscallaneous_B());
+        // This invariant is failling because:
+        // When rebaseOptIn is called, _balanceToRebasingCredits calculs user credits.
+        // But credits are rounded-up, which increase balanceOf when user rebaseOptIn.
+        // How to solve it?
+        // Round-down credits in _balanceToRebasingCredits, but is it really a problem?
         assertTrue(property_miscallaneous_E()); // Failling
         assertTrue(property_miscallaneous_F()); // Failling
     }
