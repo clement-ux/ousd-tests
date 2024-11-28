@@ -6,13 +6,14 @@ import {StdUtils} from "forge-std/StdUtils.sol";
 
 // Utils
 import {Setup} from "./Setup.sol";
+import {Utils} from "./Utils.sol";
 
 // Contracts
 import {OUSD} from "origin/token/OUSD.sol";
 
 /// @title Properties contract
 /// @notice Use to store all the properties (invariants) of the system.
-abstract contract Properties is Setup, StdUtils {
+abstract contract Properties is Setup, StdUtils, Utils {
     //////////////////////////////////////////////////////
     /// --- GHOST VARIABLES
     //////////////////////////////////////////////////////
