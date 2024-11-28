@@ -16,20 +16,31 @@ abstract contract TargetFunctions is Properties {
     //////////////////////////////////////////////////////
     /// --- CONSTANTS & IMMUTABLES
     //////////////////////////////////////////////////////
-    // This DOS_CHECK constant is used to check if the contract is able to handle the situation where it should revert.
-    // If true, no transaction should revert. If false, some transaction might revert.
+    /// @notice This DOS_CHECK constant is used to check if the contract is able to handle the situation where it should revert.
+    /// If true, no transaction should revert. If false, some transaction might revert.
     bool public constant DOS_CHECK = false;
+
+    /// @notice Maximum supply of OUSD.
     uint256 public constant MAX_SUPPLY = type(uint128).max;
-    uint256 public constant MAX_SUPPLY_CHANGE_PCT = 1e18; // 100%
+    /// @notice Maximum value for totalSupply increase percentage, when totalSupply is below MAX_SUPPLY_REDUCE_CHANGE_PCT_THRESHOLD.
+    uint256 public constant MAX_SUPPLY_CHANGE_PCT_DEFAULT = 100e16; // 100%
+    /// @notice Maximum value for totalSupply increase percentage, when totalSupply is above MAX_SUPPLY_REDUCE_CHANGE_PCT_THRESHOLD.
+    uint256 public constant MAX_SUPPLY_CHANGE_PCT_SLOW = 10e16; // 10%
+    /// @notice Above this threshold, the fuzzer will increase the supply by a value between 0.000000000000000001% and MAX_SUPPLY_CHANGE_PCT_SLOW.
+    uint256 public constant MAX_SUPPLY_REDUCE_CHANGE_PCT_THRESHOLD = 1_000_000e18; // 1 OETH
+
+    /// @notice Above this value, logs will display a warning on mint and burn.
+    uint256 public constant NOTIFY_MINT_BURN_THRESHOLD = 100_000_000e18; // 100M OUSD
+    /// @notice Above this value, logs will display a warning on changeSupply.
+    uint256 public constant NOTIFY_TOTAL_SUPPLY_THRESHOLD = 10_000_000_000e18; // 1B OUSD
 
     //////////////////////////////////////////////////////
     /// --- HANDLERS
     //////////////////////////////////////////////////////
     /// @notice Handler to mint a random amount of OETH to a random user.
     /// @param _account The index of the user to mint to.
-    /// @param _amount The amount to mint. Maximum value is 2^96 - 1 (approx equal to 79B ether).
+    /// @param _amount The amount to mint. Maximum value is 2^96 - 1 (approx equal to 309M ether).
     /// We could have use higher uint type, but it doesn't match real world usage.
-    /// We could have use uint88 (approx equal to 309M ether), but it's slightly too low.
     function handler_mint(uint8 _account, uint96 _amount) public {
         // Select a random users among the list.
         address user = users[_account % users.length];
@@ -47,7 +58,12 @@ abstract contract TargetFunctions is Properties {
         oeth.mint(user, _amount);
 
         // Idea: use a color when the value is high.
-        console.log("OETH function: mint() \t\t from: %s \t to: %s \t amount: %18e", "Null", names[user], _amount);
+        console.log(
+            "OETH function: mint() \t\t from: Null \t\t\t to: %s \t amount: %18e \t %s",
+            names[user],
+            _amount,
+            _amount > NOTIFY_MINT_BURN_THRESHOLD ? "!!! LARGE MINT !!!" : ""
+        );
 
         // Update ghost
         if (balanceBefore + _amount != oeth.balanceOf(user)) ghost_mi_E = false;
@@ -91,7 +107,12 @@ abstract contract TargetFunctions is Properties {
         oeth.burn(user, _amount);
 
         // Idea: use a color when the value is high.
-        console.log("OETH function: burn() \t\t from: %s \t to: %s \t amount: %18e", names[user], "Null", _amount);
+        console.log(
+            "OETH function: burn() \t\t from: %s \t\t\t to: Null \t amount: %18e \t %s",
+            names[user],
+            _amount,
+            _amount > NOTIFY_MINT_BURN_THRESHOLD ? "!!! LARGE BURN !!!" : ""
+        );
 
         // Update ghost
         if (balanceOf != oeth.balanceOf(user) + _amount) ghost_mi_F = false;
@@ -99,7 +120,7 @@ abstract contract TargetFunctions is Properties {
 
     /// @notice Handler to change the totalSupply of OETH.
     /// @param _pctChange The percentage change to apply to the totalSupply.
-    /// Clamped between 0.000000000000000001% and MAX_SUPPLY_CHANGE_PCT.
+    /// Clamped between 0.000000000000000001% and MAX_SUPPLY_CHANGE_PCT_DEFAULT/SLOW.
     function handler_changeSupply(uint64 _pctChange) public {
         // Fetch and cache totalSupply.
         uint256 totalSupply = oeth.totalSupply();
@@ -134,8 +155,16 @@ abstract contract TargetFunctions is Properties {
             return;
         }
 
-        // Bound the percentage change between 0.000000000000000001% and 100%.
-        _pctChange = uint64(_bound(_pctChange, 1, MAX_SUPPLY_CHANGE_PCT));
+        // Bound the percentage change between 0.000000000000000001% and MAX_SUPPLY_CHANGE_PCT_DEFAULT/SLOW.
+        _pctChange = uint64(
+            _bound(
+                _pctChange,
+                1,
+                totalSupply < MAX_SUPPLY_REDUCE_CHANGE_PCT_THRESHOLD
+                    ? MAX_SUPPLY_CHANGE_PCT_DEFAULT
+                    : MAX_SUPPLY_CHANGE_PCT_SLOW
+            )
+        );
         // Calculate the new totalSupply.
         uint256 newTotalSupply = totalSupply * (1e18 + _pctChange) / 1e18;
 
@@ -145,7 +174,10 @@ abstract contract TargetFunctions is Properties {
 
         // Idea: use a color when the percentage change is high.
         console.log(
-            "OETH function: changeSupply() \t from: %18e \t to: %18e (%16e%)", totalSupply, newTotalSupply, _pctChange
+            "OETH function: changeSupply() \t pct : %16e% \t\t\t new_ts: %18e \t %s",
+            _pctChange,
+            newTotalSupply,
+            newTotalSupply > NOTIFY_TOTAL_SUPPLY_THRESHOLD ? "!!! WARNING TOTAL SUPPLY!!!" : ""
         );
 
         // Update ghost
@@ -188,7 +220,7 @@ abstract contract TargetFunctions is Properties {
         oeth.transfer(to, _amount);
 
         console.log(
-            "OETH function: transfer() \t\t from: %s \t to: %s \t amount: %18e", names[from], names[to], _amount
+            "OETH function: transfer() \t\t from: %s \t\t\t to: %s \t amount: %18e", names[from], names[to], _amount
         );
 
         // Update ghost
@@ -338,7 +370,7 @@ abstract contract TargetFunctions is Properties {
         hevm.prank(governor);
         oeth.delegateYield(from, to);
 
-        console.log("OETH function: delegateYield() \t from: %s \t to: %s", names[from], names[to]);
+        console.log("OETH function: delegateYield() \t from: %s \t\t\t to: %s", names[from], names[to]);
     }
 
     /// @notice Handler to undelegateYield a random user.
