@@ -39,9 +39,9 @@ abstract contract TargetFunctions is Properties {
     //////////////////////////////////////////////////////
     /// @notice Handler to mint a random amount of OETH to a random user.
     /// @param _account The index of the user to mint to.
-    /// @param _amount The amount to mint. Maximum value is 2^96 - 1 (approx equal to 309M ether).
+    /// @param _amount The amount to mint. Maximum value is 2^88 - 1 (approx equal to 309M ether).
     /// We could have use higher uint type, but it doesn't match real world usage.
-    function handler_mint(uint8 _account, uint96 _amount) public {
+    function handler_mint(uint8 _account, uint88 _amount) public {
         // Select a random users among the list.
         address user = users[_account % users.length];
 
@@ -74,9 +74,9 @@ abstract contract TargetFunctions is Properties {
     /// @param _amount The amount to burn. The goal here is (when no t is DOS_CHECK mode), to try to burn sometime more
     /// that the user has, to see how the contract handle it. Under normal conditions it should revert.
     /// But in the situtation where the contract doesn't revert, invariants will catch it.
-    /// Using uint96 instead of uint256 allow us to reduce reverting call. Because user can mint max 2^96 - 1.
+    /// Using uint88 instead of uint256 allow us to reduce reverting call. Because user can mint max 2^88 - 1.
     /// The higher the _amount uint type, the higher the chance to revert, but a too low value will not deeply test the contract.
-    function handler_burn(uint8 _account, uint96 _amount) public {
+    function handler_burn(uint8 _account, uint88 _amount) public {
         // Select random user with balance > 0.
         address user;
         uint256 balanceOf;
@@ -100,7 +100,7 @@ abstract contract TargetFunctions is Properties {
         // Bound amount to burn.
         // Clamped between 1, because burning 0 is useless as return early and doesn't perfom any action.
         // Clamped between balanceOf, because burning more than the balance should revert.
-        if (DOS_CHECK) _amount = uint96(_bound(_amount, 1, balanceOf));
+        if (DOS_CHECK) _amount = uint88(_bound(_amount, 1, balanceOf));
 
         // Prank the vault address.
         hevm.prank(address(vault));
