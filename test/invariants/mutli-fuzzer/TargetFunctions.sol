@@ -179,6 +179,7 @@ abstract contract TargetFunctions is Properties {
             newTotalSupply,
             newTotalSupply > NOTIFY_TOTAL_SUPPLY_THRESHOLD ? "!!! WARNING TOTAL SUPPLY!!!" : ""
         );
+        if (oeth.rebasingCreditsPerTokenHighres() < 1e18) console.log("!!! WARNING rcpt < 1e16 !!!");
 
         // Update ghost
         ghost_ri_B = eq(oeth.totalSupply(), min(newTotalSupply, MAX_SUPPLY));
