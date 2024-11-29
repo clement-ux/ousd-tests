@@ -39,13 +39,13 @@ contract FuzzerFoundry is Test, TargetFunctions {
 
         // Mint some OETH to dead address to avoid empty contract
         vm.prank(address(vault));
-        oeth.mint(dead, 0.01 ether);
+        oeth.mint(dead, 1 ether);
 
         // Mint some OETH to rebaseOptOut dead2 address to avoid empty contract
         vm.prank(dead2);
         oeth.rebaseOptOut();
         vm.prank(address(vault));
-        oeth.mint(dead2, 0.01 ether);
+        oeth.mint(dead2, 1 ether);
     }
 
     //////////////////////////////////////////////////////
@@ -88,7 +88,6 @@ contract FuzzerFoundry is Test, TargetFunctions {
         assertTrue(property_balance_C());
     }
 
-    // Failling
     function invariant_balance_D() public view {
         assertTrue(property_balance_D());
         // This invariant is failling because:
@@ -100,8 +99,9 @@ contract FuzzerFoundry is Test, TargetFunctions {
         //     (totalSupply - nonRebasingSupply);
     }
 
-    // Failling
     function invariant_balance_E() public view {
+        // Failling when rebasingCreditsPerToken < 1e18,
+        // for the same reason as invariant_miscallaneous_A_B_E_F
         assertTrue(property_balance_E());
     }
 
