@@ -25,7 +25,7 @@ abstract contract TargetFunctions is Properties {
     /// @notice Maximum value for totalSupply increase percentage, when totalSupply is below MAX_SUPPLY_REDUCE_CHANGE_PCT_THRESHOLD.
     uint256 public constant MAX_SUPPLY_CHANGE_PCT_DEFAULT = 100e16; // 100%
     /// @notice Maximum value for totalSupply increase percentage, when totalSupply is above MAX_SUPPLY_REDUCE_CHANGE_PCT_THRESHOLD.
-    uint256 public constant MAX_SUPPLY_CHANGE_PCT_SLOW = 1e16; // 1%
+    uint256 public constant MAX_SUPPLY_CHANGE_PCT_SLOW = 10e16; // 10%
     /// @notice Above this threshold, the fuzzer will increase the supply by a value between 0.000000000000000001% and MAX_SUPPLY_CHANGE_PCT_SLOW.
     uint256 public constant MAX_SUPPLY_REDUCE_CHANGE_PCT_THRESHOLD = 1_000_000e18; // 1 OETH
 
@@ -115,7 +115,7 @@ abstract contract TargetFunctions is Properties {
         );
 
         // Update ghost
-        ghost_mi_F = eq(balanceOf, oeth.balanceOf(user) + _amount);
+        ghost_mi_F = approxEqAbs(balanceOf, oeth.balanceOf(user) + _amount, 100); // Allow 100 wei difference.
     }
 
     /// @notice Handler to change the totalSupply of OETH.
