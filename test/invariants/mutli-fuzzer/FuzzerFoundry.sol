@@ -105,9 +105,18 @@ contract FuzzerFoundry is Test, TargetFunctions {
         assertTrue(property_balance_E());
     }
 
-    // Failling
     function invariant_balance_F() public view {
         assertTrue(property_balance_F());
+        // This invariant is failling because:
+        // When delegateYield is called, _balanceToRebasingCredits calculs user credits.
+        // In the situation where an user with no balance delegate yield to an user with 
+        // balanceOf > 0, _balanceToRebasingCredits will increase the previous balanceOf.
+        // See explanation here for rounding up invariant_miscallaneous_A_B_E_F.
+        // This directly increase the previous credits.
+        // Note: the maximum error is 1e9 wei, which result in 1 wei error in balanceOf.
+        // How to solve it?
+        // Round-down credits in _balanceToRebasingCredits, but maximum error is bellow 
+        // 1 wei, so is it really a problem?
     }
 
     function invariant_balance_G() public view {
