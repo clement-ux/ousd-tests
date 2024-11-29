@@ -40,12 +40,6 @@ contract FuzzerFoundry is Test, TargetFunctions {
         // Mint some OETH to dead address to avoid empty contract
         vm.prank(address(vault));
         oeth.mint(dead, 1 ether);
-
-        // Mint some OETH to rebaseOptOut dead2 address to avoid empty contract
-        vm.prank(dead2);
-        oeth.rebaseOptOut();
-        vm.prank(address(vault));
-        oeth.mint(dead2, 1 ether);
     }
 
     //////////////////////////////////////////////////////

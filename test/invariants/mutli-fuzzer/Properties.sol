@@ -178,7 +178,6 @@ abstract contract Properties is Setup, StdUtils, Utils {
         }
 
         sum += oeth.balanceOf(dead);
-        sum += oeth.balanceOf(dead2);
 
         return sum <= oeth.totalSupply();
     }
@@ -193,8 +192,6 @@ abstract contract Properties is Setup, StdUtils, Utils {
                 sum += oeth.balanceOf(user_);
             }
         }
-
-        sum += oeth.balanceOf(dead2);
 
         return sum <= oeth.nonRebasingSupply();
     }
