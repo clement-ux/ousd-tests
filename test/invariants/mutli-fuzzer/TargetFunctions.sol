@@ -115,7 +115,7 @@ abstract contract TargetFunctions is Properties {
         );
 
         // Update ghost
-        if (balanceOf != oeth.balanceOf(user) + _amount) ghost_mi_F = false;
+        ghost_mi_F = eq(balanceOf, oeth.balanceOf(user) + _amount);
     }
 
     /// @notice Handler to change the totalSupply of OETH.
@@ -181,7 +181,7 @@ abstract contract TargetFunctions is Properties {
         );
 
         // Update ghost
-        if (oeth.totalSupply() != min(newTotalSupply, MAX_SUPPLY)) ghost_ri_B = false;
+        ghost_ri_B = eq(oeth.totalSupply(), min(newTotalSupply, MAX_SUPPLY));
     }
 
     /// @notice Handler to transfer a random amount of OETH from a random user to another random user.
@@ -225,10 +225,10 @@ abstract contract TargetFunctions is Properties {
 
         // Update ghost
         if (from != to) {
-            ghost_bi_B = oeth.balanceOf(from) + _amount == balanceOfBeforeFrom;
-            ghost_bi_C = oeth.balanceOf(to) == balanceOfBeforeTo + _amount;
+            ghost_bi_B = eq(oeth.balanceOf(from) + _amount, balanceOfBeforeFrom);
+            ghost_bi_C = eq(oeth.balanceOf(to), balanceOfBeforeTo + _amount);
         } else {
-            ghost_bi_B = oeth.balanceOf(from) == balanceOfBeforeFrom;
+            ghost_bi_B = eq(oeth.balanceOf(from), balanceOfBeforeFrom);
         }
     }
 
@@ -270,7 +270,7 @@ abstract contract TargetFunctions is Properties {
         console.log("OETH function: rebaseOptIn() \t\t from: %s", names[user]);
 
         // Update ghost
-        ghost_mi_B = oeth.balanceOf(user) == balanceBefore;
+        ghost_mi_B = eq(oeth.balanceOf(user), balanceBefore);
     }
 
     /// @notice Handler to rebaseOptOut a random user.
@@ -311,7 +311,7 @@ abstract contract TargetFunctions is Properties {
         console.log("OETH function: rebaseOptOut() \t from: %s", names[user]);
 
         // Update ghost
-        if (oeth.balanceOf(user) != balanceBefore) ghost_mi_D = false;
+        ghost_mi_D = eq(oeth.balanceOf(user), balanceBefore);
     }
 
     /// @notice Handler to delegateYield a random user to another random user.
