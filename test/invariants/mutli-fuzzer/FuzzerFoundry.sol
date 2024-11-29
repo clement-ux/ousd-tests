@@ -90,13 +90,8 @@ contract FuzzerFoundry is Test, TargetFunctions {
 
     function invariant_balance_D() public view {
         assertTrue(property_balance_D());
-        // This invariant is failling because:
-        // When changeSupply is called, rebasingCreditsPerToken_ is rounded-down.
-        // Then balanceOf is over-estimtaed.
-        // How to solve it?
-        // rebasingCreditsPerToken_ =
-        //     ((rebasingCredits_ * 1e18 + (totalSupply - nonRebasingSupply - 1)) /
-        //     (totalSupply - nonRebasingSupply);
+        // This invariant is previously failling.
+        // Fixed in commit `93545c3`
     }
 
     function invariant_balance_E() public view {
