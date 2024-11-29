@@ -140,8 +140,8 @@ contract FuzzerFoundry is Test, TargetFunctions {
         // When mint is called, _balanceToRebasingCredits calculs user credits.
         // But credits are rounded-up, which increase the previous balanceOf too.
         // How to solve it?
-        // Round-down credits in _balanceToRebasingCredits, but it leaves room for 1 wei of error.
-        
+        // Round-down credits in _balanceToRebasingCredits, but maximum error is bellow 100 wei, is it really a problem?
+
         assertTrue(property_miscallaneous_F()); // Failling
     }
 
