@@ -44,7 +44,7 @@ abstract contract Properties is Setup, StdUtils, Utils {
     // Invariant D: ∀ user, ∑balanceOf(user) <= totalSupply
     // Invariant E: ∀ user ∈ [rebaseState == StdNonRebasing], ∑balanceOf(user) == nonRebasingSupply
     // Invariant F: ∀ user ∈ [rebaseState == NotSet || StdRebasing || YieldDelegationTarget], ∑creditBalances(user) == rebasingCredits (± 2e9 * #users * #call wei)
-    // Invariant G: ∀ user, balanceOf(user) == _creditBalances[account] * (alternativeCreditsPerToken[account] > 0 ? alternativeCreditsPerToken[account] : _rebasingCreditsPerToken) - (yieldFrom[account] == 0 ? 0 : _creditBalances[yieldFrom[account]])
+    // Invariant G: ∀ user, balanceOf(user) == _creditBalances[account] * 1e18 / (alternativeCreditsPerToken[account] > 0 ? alternativeCreditsPerToken[account] : _rebasingCreditsPerToken) - (yieldFrom[account] == 0 ? 0 : _creditBalances[yieldFrom[account]])
 
     // --- Rebasing invariants ---
     // Invariant A: totalSupply >= nonRebasingCredits + (rebasingCredits / rebasingCreditsPerToken)
@@ -216,6 +216,34 @@ abstract contract Properties is Setup, StdUtils, Utils {
         sum += creditBalance;
 
         return approxEqAbs(sum, oeth.rebasingCreditsHighres(), users.length * 2e9 * 100);
+    }
+
+    function property_balance_G() public view returns (bool) {
+        for (uint256 i; i < users.length; i++) {
+            address user = users[i];
+            (uint256 creditBalance,,) = oeth.creditsBalanceOfHighres(user);
+            (uint256 creditBalanceYieldFrom,,) = oeth.creditsBalanceOfHighres(oeth.yieldFrom(user));
+
+            uint256 alternativeCreditsPerToken = oeth.nonRebasingCreditsPerToken(user);
+            if (
+                approxEqAbs(
+                    oeth.balanceOf(user),
+                    creditBalance * 1e18
+                        / (
+                            alternativeCreditsPerToken > 0
+                                ? alternativeCreditsPerToken
+                                : oeth.rebasingCreditsPerTokenHighres()
+                        ) - (oeth.yieldFrom(user) == address(0) ? 0 : creditBalanceYieldFrom),
+                    0
+                )
+            ) {
+                continue;
+            } else {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     //////////////////////////////////////////////////////
