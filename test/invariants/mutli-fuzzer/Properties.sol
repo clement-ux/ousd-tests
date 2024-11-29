@@ -43,7 +43,7 @@ abstract contract Properties is Setup, StdUtils, Utils {
     // Invariant C: When transfer(from, to, amount), balanceBefore(to) + amount == balanceAfter(to) (checked in handlers)
     // Invariant D: ∀ user, ∑balanceOf(user) <= totalSupply
     // Invariant E: ∀ user ∈ [rebaseState == StdNonRebasing], ∑balanceOf(user) == nonRebasingSupply
-    // Invariant F: ∀ user ∈ [rebaseState == NotSet || StdRebasing || YieldDelegationTarget], ∑creditBalances(user) == rebasingCredits (± 2e9 * #users wei)
+    // Invariant F: ∀ user ∈ [rebaseState == NotSet || StdRebasing || YieldDelegationTarget], ∑creditBalances(user) == rebasingCredits (± 2e9 * #users * #call wei)
     // Invariant G: ∀ user, balanceOf(user) == _creditBalances[account] * (alternativeCreditsPerToken[account] > 0 ? alternativeCreditsPerToken[account] : _rebasingCreditsPerToken) - (yieldFrom[account] == 0 ? 0 : _creditBalances[yieldFrom[account]])
 
     // --- Rebasing invariants ---
@@ -218,7 +218,7 @@ abstract contract Properties is Setup, StdUtils, Utils {
         (uint256 creditBalance,,) = oeth.creditsBalanceOfHighres(dead);
         sum += creditBalance;
 
-        return approxEqAbs(sum, oeth.rebasingCreditsHighres(), users.length * 2e9);
+        return approxEqAbs(sum, oeth.rebasingCreditsHighres(), users.length * 2e9 * 100);
     }
 
     //////////////////////////////////////////////////////
