@@ -135,14 +135,17 @@ contract FuzzerFoundry is Test, TargetFunctions {
         // How to solve it?
         // Round-down credits in _balanceToRebasingCredits, but is it really a problem?
 
-        assertTrue(property_miscallaneous_E());
-        // This invariant is failling because:
-        // When mint is called, _balanceToRebasingCredits calculs user credits.
+        // This two following invariants are failling because:
+        // When mint/burn is called, _balanceToRebasingCredits calculs user credits.
         // But credits are rounded-up, which increase the previous balanceOf too.
+        // Then when in the rare situation where `rebasingCreditsPerToken` < 1e18, when calculating `balanceOf`,
+        // dividing by rebasingCreditsPerToken will start to bring errors instead of removing it! (because 1e16 < 1e18)
+        // In the current implementation, why a totalSupply < 10B ether, min rebasingCreditsPerToken is 1e16.
+        // Then the maximum error is 99 wei.
         // How to solve it?
-        // Round-down credits in _balanceToRebasingCredits, but maximum error is bellow 100 wei, is it really a problem?
-
-        assertTrue(property_miscallaneous_F()); // Failling
+        // Round-down credits in _balanceToRebasingCredits, but maximum error is bellow 100 wei, so is it really a problem?
+        assertTrue(property_miscallaneous_E());
+        assertTrue(property_miscallaneous_F());
     }
 
     function invariant_miscallaneous_C_D() public view {

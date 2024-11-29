@@ -57,8 +57,8 @@ abstract contract Properties is Setup, StdUtils, Utils {
     // Invariant B: When rebaseOptIn(), balanceBefore(user) == balanceAfter(user) (checked in handlers)
     // Invariant C: ∀ user ∈ [rebaseState == StdNonRebasing], alternativeCreditsPerToken[user] == 1e18
     // Invariant D: When rebaseOptOut(), balanceBefore(user) == balanceAfter(user) (checked in handlers)
-    // Invariant E: When mint(to, amount), balanceBefore(to) + amount == balanceAfter(to) + 100 wei (checked in handlers)
-    // Invariant F: When burn(from, amount), balanceBefore(from) == balanceAfter(from) + amount (checked in handlers)
+    // Invariant E: When mint(to, amount), balanceBefore(to) + amount == balanceAfter(to) (± 100 wei) (checked in handlers)
+    // Invariant F: When burn(from, amount), balanceBefore(from) == balanceAfter(from) + amount (± 100 wei) (checked in handlers)
 
     //////////////////////////////////////////////////////
     /// --- ACCOUNT INVARIANTS
