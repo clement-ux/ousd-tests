@@ -215,8 +215,12 @@ abstract contract TargetFunctions is Properties {
 
         // User can send to himself.
         address to = users[_to % users.length];
+
+        // Cache totalSupply and balanceOf before transfer.
+        uint256 totalSupply = oeth.totalSupply();
         uint256 balanceOfBeforeTo = oeth.balanceOf(to);
 
+        // Transfer
         hevm.prank(from);
         oeth.transfer(to, _amount);
 
@@ -225,6 +229,7 @@ abstract contract TargetFunctions is Properties {
         );
 
         // Update ghost
+        ghost_bi_A = eq(oeth.totalSupply(), totalSupply);
         if (from != to) {
             ghost_bi_B = eq(oeth.balanceOf(from) + _amount, balanceOfBeforeFrom);
             ghost_bi_C = eq(oeth.balanceOf(to), balanceOfBeforeTo + _amount);
@@ -261,7 +266,8 @@ abstract contract TargetFunctions is Properties {
             return;
         }
 
-        // Cache balance before rebaseOptIn.
+        // Cache totalSupply and balance before rebaseOptIn.
+        uint256 totalSupply = oeth.totalSupply();
         uint256 balanceBefore = oeth.balanceOf(user);
 
         // RebaseOptIn
@@ -271,6 +277,7 @@ abstract contract TargetFunctions is Properties {
         console.log("OETH function: rebaseOptIn() \t\t from: %s", names[user]);
 
         // Update ghost
+        ghost_bi_A = eq(oeth.totalSupply(), totalSupply);
         ghost_mi_B = eq(oeth.balanceOf(user), balanceBefore);
     }
 
@@ -302,7 +309,8 @@ abstract contract TargetFunctions is Properties {
             return;
         }
 
-        // Cache balance before rebaseOptOut.
+        // Cache totalSupply and balance before rebaseOptOut.
+        uint256 totalSupply = oeth.totalSupply();
         uint256 balanceBefore = oeth.balanceOf(user);
 
         // RebaseOptOut
@@ -312,6 +320,7 @@ abstract contract TargetFunctions is Properties {
         console.log("OETH function: rebaseOptOut() \t from: %s", names[user]);
 
         // Update ghost
+        ghost_bi_A = eq(oeth.totalSupply(), totalSupply);
         ghost_mi_D = eq(oeth.balanceOf(user), balanceBefore);
     }
 
@@ -367,11 +376,17 @@ abstract contract TargetFunctions is Properties {
             return;
         }
 
+        // Cache totalSupply before delegateYield.
+        uint256 totalSupply = oeth.totalSupply();
+
         // Delegate yield
         hevm.prank(governor);
         oeth.delegateYield(from, to);
 
         console.log("OETH function: delegateYield() \t from: %s \t\t\t to: %s", names[from], names[to]);
+
+        // Update ghost
+        ghost_bi_A = eq(oeth.totalSupply(), totalSupply);
     }
 
     /// @notice Handler to undelegateYield a random user.
@@ -394,11 +409,17 @@ abstract contract TargetFunctions is Properties {
             return;
         }
 
+        // Cache totalSupply before undelegateYield.
+        uint256 totalSupply = oeth.totalSupply();
+
         // Undelegate yield
         hevm.prank(governor);
         oeth.undelegateYield(from);
 
         console.log("OETH function: undelegateYield() \t from: %s", names[from]);
+
+        // Update ghost
+        ghost_bi_A = eq(oeth.totalSupply(), totalSupply);
     }
 
     // Todo: List of handler to implement

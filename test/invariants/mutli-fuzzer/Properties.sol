@@ -17,6 +17,7 @@ abstract contract Properties is Setup, StdUtils, Utils {
     //////////////////////////////////////////////////////
     /// --- GHOST VARIABLES
     //////////////////////////////////////////////////////
+    bool public ghost_bi_A = true;
     bool public ghost_bi_B = true;
     bool public ghost_bi_C = true;
     bool public ghost_ri_B = true;
@@ -38,7 +39,7 @@ abstract contract Properties is Setup, StdUtils, Utils {
     // Invariant F: ∀ yieldFrom[user] != address(0), yieldTo[yieldFrom[user]] == user
 
     // --- Balance invariants ---
-    // Invariant A:
+    // Invariant A: When transfer(), rebaseOptIn(), rebaseOptOut(), delegateYield(), undelegateYield(), totalSupplyBefore == totalSupplyAfter.
     // Invariant B: When transfer(from, to, amount), balanceBefore(from) == balanceAfter(from) + amount (checked in handlers)
     // Invariant C: When transfer(from, to, amount), balanceBefore(to) + amount == balanceAfter(to) (checked in handlers)
     // Invariant D: ∀ user, ∑balanceOf(user) <= totalSupply
@@ -160,7 +161,9 @@ abstract contract Properties is Setup, StdUtils, Utils {
     //////////////////////////////////////////////////////
     /// --- BALANCE INVARIANTS
     //////////////////////////////////////////////////////
-    function property_balance_A() public view returns (bool) {}
+    function property_balance_A() public view returns (bool) {
+        return ghost_bi_A;
+    }
 
     function property_balance_B() public view returns (bool) {
         return ghost_bi_B;
