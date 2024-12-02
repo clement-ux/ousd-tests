@@ -18,7 +18,7 @@ fail_on_revert = false
 [dependencies]
 forge-std = "1.9.4"
 origin-dollar = { version = "1", git = "https://github.com/OriginProtocol/origin-dollar.git", rev = "dc7970116395447ae2b7f59be9bd57d060bad18a" }    # master
-origin-dollar-yd = { version = "1", git = "https://github.com/OriginProtocol/origin-dollar.git", rev = "dc854bcbf99959ecbba0d37f336e2b6e98d1d12a" } # rebaseElsewhere_v2
+origin-dollar-yd = { version = "1", git = "https://github.com/OriginProtocol/origin-dollar.git", rev = "63ee2ba0c5f3b96b9c672f3d67d07c4cd5981cef" } # rebaseElsewhere_v2
 "@openzeppelin-contracts" = "4.2"
 
 [soldeer]
