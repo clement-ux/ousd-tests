@@ -69,7 +69,7 @@ contract FuzzerFoundry is Test, TargetFunctions {
     /// --- BALANCE INVARIANTS
     //////////////////////////////////////////////////////
     function invariant_balance_A() public view {
-        // Not implemented yet
+        assertTrue(property_balance_A());
     }
 
     // Failling
