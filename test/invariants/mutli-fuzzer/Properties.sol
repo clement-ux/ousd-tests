@@ -52,6 +52,7 @@ abstract contract Properties is Setup, StdUtils, Utils {
     // Invariant B: When changeSupply(newValue), totalSupply == newValue (checked in handlers)
     // Invariant C: ∀ user ∈ [rebaseState == StdNonRebasing || YieldDelegationSource], if transfer(amount) || mint(amount) || burn(amount) && amount != 0, balanceOfBefore(user) != balanceOfAfter(user) (checked in handlers)
     // Note for Invariant C: This is already checked with Balance Invariant B_C and Miscallaneous Invariant E_F, so I will not implement it here.
+    // Invariant D: rebasingCreditPerToken <= 1e27
 
     // --- Miscellaneous invariants ---
     // Invariant A: ∀ user ∈ [rebaseState == StdRebasing], alternativeCreditsPerToken[user] == 0
@@ -259,6 +260,10 @@ abstract contract Properties is Setup, StdUtils, Utils {
 
     function property_rebasing_B() public view returns (bool) {
         return ghost_ri_B;
+    }
+
+    function property_rebasing_D() public view returns (bool) {
+        return lte(oeth.rebasingCreditsPerToken(), 1e27);
     }
 
     //////////////////////////////////////////////////////

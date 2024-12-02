@@ -119,6 +119,7 @@ contract FuzzerFoundry is Test, TargetFunctions {
     function invariant_rebasing_A() public view {
         assertTrue(property_rebasing_A());
         assertTrue(property_rebasing_B());
+        assertTrue(property_rebasing_D());
     }
 
     //////////////////////////////////////////////////////
