@@ -20,10 +20,6 @@ abstract contract Utils {
         return a == b;
     }
 
-    function approxEqAbs(uint256 a, uint256 b, uint256 epsilon) public pure returns (bool) {
-        return absDiff(a, b) <= epsilon;
-    }
-
     function gt(uint256 a, uint256 b) public pure returns (bool) {
         return a > b;
     }
@@ -38,5 +34,25 @@ abstract contract Utils {
 
     function lte(uint256 a, uint256 b) public pure returns (bool) {
         return a <= b;
+    }
+
+    function approxEqAbs(uint256 a, uint256 b, uint256 epsilon) public pure returns (bool) {
+        return absDiff(a, b) <= epsilon;
+    }
+
+    function boundedGtAbs(uint256 a, uint256 b, uint256 epsilon) public pure returns (bool) {
+        return a > b && absDiff(a, b) <= epsilon;
+    }
+
+    function boundedGteAbs(uint256 a, uint256 b, uint256 epsilon) public pure returns (bool) {
+        return a == b || (a > b && absDiff(a, b) <= epsilon);
+    }
+
+    function boundedLtAbs(uint256 a, uint256 b, uint256 epsilon) public pure returns (bool) {
+        return a < b && absDiff(a, b) <= epsilon;
+    }
+
+    function boundedLteAbs(uint256 a, uint256 b, uint256 epsilon) public pure returns (bool) {
+        return a <= b && absDiff(a, b) <= epsilon;
     }
 }
