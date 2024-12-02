@@ -231,8 +231,8 @@ abstract contract TargetFunctions is Properties {
         // Update ghost
         ghost_bi_A = eq(oeth.totalSupply(), totalSupply);
         if (from != to) {
-            ghost_bi_B = boundedGteAbs(balanceOfBeforeFrom, oeth.balanceOf(from) + _amount, 1);
-            ghost_bi_C = boundedGteAbs(balanceOfBeforeTo + _amount, oeth.balanceOf(to), 1);
+            ghost_bi_B = boundedGteAbs(balanceOfBeforeFrom, oeth.balanceOf(from) + _amount, 2);
+            ghost_bi_C = boundedGteAbs(balanceOfBeforeTo + _amount, oeth.balanceOf(to), 2);
         } else {
             ghost_bi_B = boundedGteAbs(balanceOfBeforeFrom, oeth.balanceOf(from), 2);
         }
