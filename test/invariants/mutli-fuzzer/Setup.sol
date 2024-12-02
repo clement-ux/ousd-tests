@@ -112,8 +112,6 @@ abstract contract Setup {
     }
 
     function _deployContracts() private {
-        hevm.startPrank(deployer);
-
         // 1. Deploy proxy.
         oethProxy = new OETHProxy();
 
@@ -127,8 +125,6 @@ abstract contract Setup {
 
         // 4. Set proxy as OETH.
         oeth = OETH(address(oethProxy));
-
-        hevm.stopPrank();
     }
 
     function _makeAddr(string memory _name) internal virtual returns (address) {
