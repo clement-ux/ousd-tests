@@ -13,6 +13,9 @@ docs/
 # Dotenv file
 .env
 
+# Fuzzed files
+crytic-export/
+coverage-echidna/
 
 # Soldeer
 /dependencies
