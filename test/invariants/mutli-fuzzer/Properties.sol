@@ -197,7 +197,7 @@ abstract contract Properties is Setup, StdUtils, Utils {
             }
         }
 
-        return gte(oeth.nonRebasingSupply() + 1, sum);
+        return gte(oeth.nonRebasingSupply() + 2, sum);
     }
 
     function property_balance_F() public view returns (bool) {
