@@ -72,7 +72,6 @@ contract FuzzerFoundry is Test, TargetFunctions {
         assertTrue(property_balance_A());
     }
 
-    // Failling
     function invariant_balance_B() public view {
         // Failling when rebasingCreditsPerToken < 1e18.
         assertTrue(property_balance_B());

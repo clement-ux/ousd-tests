@@ -43,7 +43,7 @@ abstract contract Properties is Setup, StdUtils, Utils {
     // Invariant B: When transfer(from, to, amount), balanceBefore(from) == balanceAfter(from) + amount (checked in handlers)
     // Invariant C: When transfer(from, to, amount), balanceBefore(to) + amount == balanceAfter(to) (checked in handlers)
     // Invariant D: ∀ user, ∑balanceOf(user) <= totalSupply
-    // Invariant E: ∀ user ∈ [rebaseState == StdNonRebasing], ∑balanceOf(user) == nonRebasingSupply
+    // Invariant E: ∀ user ∈ [rebaseState == StdNonRebasing], ∑balanceOf(user) == nonRebasingSupply (± 1 wei)
     // Invariant F: ∀ user ∈ [rebaseState == NotSet || StdRebasing || YieldDelegationTarget], ∑creditBalances(user) == rebasingCredits (± 2e9 * #users * #call wei)
     // Invariant G: ∀ user, balanceOf(user) == _creditBalances[account] * 1e18 / (alternativeCreditsPerToken[account] > 0 ? alternativeCreditsPerToken[account] : _rebasingCreditsPerToken) - (yieldFrom[account] == 0 ? 0 : _creditBalances[yieldFrom[account]])
 
@@ -59,8 +59,8 @@ abstract contract Properties is Setup, StdUtils, Utils {
     // Invariant B: When rebaseOptIn(), balanceBefore(user) == balanceAfter(user) (checked in handlers)
     // Invariant C: ∀ user ∈ [rebaseState == StdNonRebasing], alternativeCreditsPerToken[user] == 1e18
     // Invariant D: When rebaseOptOut(), balanceBefore(user) == balanceAfter(user) (checked in handlers)
-    // Invariant E: When mint(to, amount), balanceBefore(to) + amount == balanceAfter(to) (± 100 wei) (checked in handlers)
-    // Invariant F: When burn(from, amount), balanceBefore(from) == balanceAfter(from) + amount (± 100 wei) (checked in handlers)
+    // Invariant E: When mint(to, amount), balanceBefore(to) + amount == balanceAfter(to) (checked in handlers)
+    // Invariant F: When burn(from, amount), balanceBefore(from) == balanceAfter(from) + amount (checked in handlers)
 
     //////////////////////////////////////////////////////
     /// --- ACCOUNT INVARIANTS
@@ -183,7 +183,7 @@ abstract contract Properties is Setup, StdUtils, Utils {
 
         sum += oeth.balanceOf(dead);
 
-        return gte(oeth.totalSupply() + 1, sum);
+        return gte(oeth.totalSupply(), sum);
     }
 
     function property_balance_E() public view returns (bool) {
@@ -197,7 +197,7 @@ abstract contract Properties is Setup, StdUtils, Utils {
             }
         }
 
-        return gte(oeth.nonRebasingSupply() + 2, sum);
+        return gte(oeth.nonRebasingSupply() + 1, sum);
     }
 
     function property_balance_F() public view returns (bool) {

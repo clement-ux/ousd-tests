@@ -66,7 +66,7 @@ abstract contract TargetFunctions is Properties {
         );
 
         // Update ghost
-        ghost_mi_E = approxEqAbs(balanceBefore + _amount, oeth.balanceOf(user), 100); // Allow 100 wei difference.
+        ghost_mi_E = eq(balanceBefore + _amount, oeth.balanceOf(user));
     }
 
     /// @notice Handler to burn a random amount of OETH from a random user.
@@ -115,7 +115,7 @@ abstract contract TargetFunctions is Properties {
         );
 
         // Update ghost
-        ghost_mi_F = approxEqAbs(balanceOf, oeth.balanceOf(user) + _amount, 100); // Allow 100 wei difference.
+        ghost_mi_F = eq(balanceOf, oeth.balanceOf(user) + _amount);
     }
 
     /// @notice Handler to change the totalSupply of OETH.
@@ -231,10 +231,10 @@ abstract contract TargetFunctions is Properties {
         // Update ghost
         ghost_bi_A = eq(oeth.totalSupply(), totalSupply);
         if (from != to) {
-            ghost_bi_B = boundedGteAbs(balanceOfBeforeFrom, oeth.balanceOf(from) + _amount, 2);
-            ghost_bi_C = boundedGteAbs(balanceOfBeforeTo + _amount, oeth.balanceOf(to), 2);
+            ghost_bi_B = eq(balanceOfBeforeFrom, oeth.balanceOf(from) + _amount);
+            ghost_bi_C = eq(balanceOfBeforeTo + _amount, oeth.balanceOf(to));
         } else {
-            ghost_bi_B = boundedGteAbs(balanceOfBeforeFrom, oeth.balanceOf(from), 2);
+            ghost_bi_B = eq(balanceOfBeforeFrom, oeth.balanceOf(from));
         }
     }
 
@@ -278,7 +278,7 @@ abstract contract TargetFunctions is Properties {
 
         // Update ghost
         ghost_bi_A = eq(oeth.totalSupply(), totalSupply);
-        ghost_mi_B = boundedGteAbs(balanceBefore, oeth.balanceOf(user), 1);
+        ghost_mi_B = eq(balanceBefore, oeth.balanceOf(user));
     }
 
     /// @notice Handler to rebaseOptOut a random user.
