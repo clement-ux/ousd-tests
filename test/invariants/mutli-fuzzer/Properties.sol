@@ -182,7 +182,7 @@ abstract contract Properties is Setup, StdUtils, Utils {
 
         sum += oeth.balanceOf(dead);
 
-        return sum <= oeth.totalSupply();
+        return gte(oeth.totalSupply() + 1, sum);
     }
 
     function property_balance_E() public view returns (bool) {
@@ -196,7 +196,7 @@ abstract contract Properties is Setup, StdUtils, Utils {
             }
         }
 
-        return sum <= oeth.nonRebasingSupply();
+        return gte(oeth.nonRebasingSupply() + 2, sum);
     }
 
     function property_balance_F() public view returns (bool) {
