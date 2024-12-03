@@ -230,6 +230,10 @@ abstract contract TargetFunctions is Properties {
         // Cache totalSupply and balanceOf before transfer.
         uint256 totalSupply = oeth.totalSupply();
         uint256 balanceOfBeforeTo = oeth.balanceOf(to);
+        uint256[] memory balances = new uint256[](users.length);
+        for (uint256 i = 0; i < users.length; i++) {
+            balances[i] = oeth.balanceOf(users[i]);
+        }
 
         // Transfer
         hevm.prank(from);
@@ -246,6 +250,11 @@ abstract contract TargetFunctions is Properties {
             ghost_bi_C = eq(balanceOfBeforeTo + _amount, oeth.balanceOf(to));
         } else {
             ghost_bi_B = eq(balanceOfBeforeFrom, oeth.balanceOf(from));
+        }
+        for (uint256 i = 0; i < users.length; i++) {
+            if (users[i] != from && users[i] != to) {
+                ghost_mi_G = eq(balances[i], oeth.balanceOf(users[i]));
+            }
         }
     }
 

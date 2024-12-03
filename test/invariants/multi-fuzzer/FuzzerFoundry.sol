@@ -150,5 +150,6 @@ contract FuzzerFoundry is Test, TargetFunctions {
     function invariant_miscallaneous_C_D() public view {
         assertTrue(property_miscallaneous_C());
         assertTrue(property_miscallaneous_D());
+        assertTrue(property_miscallaneous_G());
     }
 }

@@ -25,6 +25,7 @@ abstract contract Properties is Setup, StdUtils, Utils {
     bool public ghost_mi_D = true;
     bool public ghost_mi_E = true;
     bool public ghost_mi_F = true;
+    bool public ghost_mi_G = true;
 
     //////////////////////////////////////////////////////
     /// --- PROPERTIES
@@ -61,6 +62,7 @@ abstract contract Properties is Setup, StdUtils, Utils {
     // Invariant D: When rebaseOptOut(), balanceBefore(user) == balanceAfter(user) (checked in handlers)
     // Invariant E: When mint(to, amount), balanceBefore(to) + amount == balanceAfter(to) (checked in handlers)
     // Invariant F: When burn(from, amount), balanceBefore(from) == balanceAfter(from) + amount (checked in handlers)
+    // Invariant G: When transfer(from, to), ∀ user /∈ [from, to], balanceBefore == balanceAfter (checked in handlers)
 
     //////////////////////////////////////////////////////
     /// --- ACCOUNT INVARIANTS
@@ -219,7 +221,7 @@ abstract contract Properties is Setup, StdUtils, Utils {
         (uint256 creditBalance,,) = oeth.creditsBalanceOfHighres(dead);
         sum += creditBalance;
 
-        return approxEqAbs(sum, oeth.rebasingCreditsHighres(), users.length * 2e9 * 100);
+        return approxEqAbs(sum, oeth.rebasingCreditsHighres(), users.length * 2e9 * 10);
     }
 
     function property_balance_G() public view returns (bool) {
@@ -317,5 +319,9 @@ abstract contract Properties is Setup, StdUtils, Utils {
 
     function property_miscallaneous_F() public view returns (bool) {
         return ghost_mi_F;
+    }
+
+    function property_miscallaneous_G() public view returns (bool) {
+        return ghost_mi_G;
     }
 }
