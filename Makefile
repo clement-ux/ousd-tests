@@ -40,6 +40,12 @@ test-c-%:
 test-all:
 	@make test-std
 
+# Invariant
+invariants:
+	make test-c-FuzzerFoundry
+	echidna . --contract FuzzerEchidna --config echidna.yaml
+	medusa fuzz
+
 # Coverage
 coverage:
 	@forge coverage --report lcov
