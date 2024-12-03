@@ -9,8 +9,8 @@ import {TargetFunctions} from "./TargetFunctions.sol";
 // solc-select use 0.8.23
 //
 // run from base project directory with:
-// echidna . --contract EchidnaFuzzer --config echidna.yaml
-contract EchidnaFuzzer is TargetFunctions {
+// echidna . --contract FuzzerEchidna --config echidna.yaml
+contract FuzzerEchidna is TargetFunctions {
     constructor() {
         setup();
 
