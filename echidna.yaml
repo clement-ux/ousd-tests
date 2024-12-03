@@ -4,7 +4,7 @@ allContracts: false
 
 # record fuzzer coverage to see what parts of the code
 # fuzzer executes
-corpusDir: "./test/invariants/multi-fuzzer/coverage-echidna"
+corpusDir: "./test/invariants/multi-fuzzer/out/echidna/"
 
 # prefix of invariant function
 prefix: "property_"
