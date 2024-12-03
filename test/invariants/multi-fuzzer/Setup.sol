@@ -68,7 +68,7 @@ abstract contract Setup {
         _deployContracts();
 
         // 5. Label addresses.
-        _labelContract();
+        //_labelContract();
     }
 
     function _setUpRealisticEnvironnement() private {
@@ -132,7 +132,7 @@ abstract contract Setup {
 
         require(_address != address(0), "Setup: invalid address");
 
-        hevm.label(_address, _name);
+        //hevm.label(_address, _name);
         return _address;
     }
 
