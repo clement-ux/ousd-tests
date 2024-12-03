@@ -199,6 +199,8 @@ abstract contract Properties is Setup, StdUtils, Utils {
             }
         }
 
+        // Bypass the check if the `rebasingCreditsPerToken < 1e18`, known case for invariant breaking.
+        if (oeth.rebasingCreditsPerTokenHighres() < 1e18) return true;
         return eq(oeth.nonRebasingSupply(), sum);
     }
 

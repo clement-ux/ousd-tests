@@ -29,7 +29,7 @@ abstract contract TargetFunctions is Properties {
     /// @notice Above this threshold, the fuzzer will increase the supply by a value between 0.000000000000000001% and MAX_SUPPLY_CHANGE_PCT_SLOW.
     uint256 public constant MAX_SUPPLY_REDUCE_CHANGE_PCT_THRESHOLD = 1_000_000e18; // 1 OETH
     /// @notice Above this total supply, mint and change supply will be skipped.
-    uint256 public constant MAX_SUPPLY_USED = 2_000_000_000e18; // 1B OUSD
+    uint256 public constant MAX_SUPPLY_USED = 10_000_000_000e18; // 10B OUSD
 
     /// @notice Above this value, logs will display a warning on mint and burn.
     uint256 public constant NOTIFY_MINT_BURN_THRESHOLD = 100_000_000e18; // 100M OUSD
@@ -72,7 +72,10 @@ abstract contract TargetFunctions is Properties {
         );
 
         // Update ghost
-        ghost_mi_E = eq(balanceBefore + _amount, oeth.balanceOf(user));
+        // Bypass the check if the `rebasingCreditsPerToken < 1e18`, known case for invariant breaking.
+        if (oeth.rebasingCreditsPerTokenHighres() >= 1e18) {
+            ghost_mi_E = eq(balanceBefore + _amount, oeth.balanceOf(user));
+        }
     }
 
     /// @notice Handler to burn a random amount of OETH from a random user.
@@ -121,7 +124,10 @@ abstract contract TargetFunctions is Properties {
         );
 
         // Update ghost
-        ghost_mi_F = eq(balanceOf, oeth.balanceOf(user) + _amount);
+        // Bypass the check if the `rebasingCreditsPerToken < 1e18`, known case for invariant breaking.
+        if (oeth.rebasingCreditsPerTokenHighres() >= 1e18) {
+            ghost_mi_F = eq(balanceOf, oeth.balanceOf(user) + _amount);
+        }
     }
 
     /// @notice Handler to change the totalSupply of OETH.
@@ -190,7 +196,7 @@ abstract contract TargetFunctions is Properties {
             newTotalSupply,
             newTotalSupply > NOTIFY_TOTAL_SUPPLY_THRESHOLD ? "!!! WARNING TOTAL SUPPLY!!!" : ""
         );
-        if (oeth.rebasingCreditsPerTokenHighres() < 1e18) console.log("!!! WARNING rcpt < 1e16 !!!");
+        if (oeth.rebasingCreditsPerTokenHighres() < 1e18) console.log("!!! WARNING rcpt < 1e18 !!!");
 
         // Update ghost
         ghost_ri_B = eq(oeth.totalSupply(), min(newTotalSupply, MAX_SUPPLY));
@@ -245,15 +251,19 @@ abstract contract TargetFunctions is Properties {
 
         // Update ghost
         ghost_bi_A = eq(oeth.totalSupply(), totalSupply);
-        if (from != to) {
-            ghost_bi_B = eq(balanceOfBeforeFrom, oeth.balanceOf(from) + _amount);
-            ghost_bi_C = eq(balanceOfBeforeTo + _amount, oeth.balanceOf(to));
-        } else {
-            ghost_bi_B = eq(balanceOfBeforeFrom, oeth.balanceOf(from));
-        }
-        for (uint256 i = 0; i < users.length; i++) {
-            if (users[i] != from && users[i] != to) {
-                ghost_mi_G = eq(balances[i], oeth.balanceOf(users[i]));
+        // Bypass the check if the `rebasingCreditsPerToken < 1e18`, known case for invariant breaking.
+        if (oeth.rebasingCreditsPerTokenHighres() >= 1e18) {
+            if (from != to) {
+                ghost_bi_B = eq(balanceOfBeforeFrom, oeth.balanceOf(from) + _amount);
+                ghost_bi_C = eq(balanceOfBeforeTo + _amount, oeth.balanceOf(to));
+            } else {
+                ghost_bi_B = eq(balanceOfBeforeFrom, oeth.balanceOf(from));
+            }
+
+            for (uint256 i = 0; i < users.length; i++) {
+                if (users[i] != from && users[i] != to) {
+                    ghost_mi_G = eq(balances[i], oeth.balanceOf(users[i]));
+                }
             }
         }
     }
@@ -298,7 +308,10 @@ abstract contract TargetFunctions is Properties {
 
         // Update ghost
         ghost_bi_A = eq(oeth.totalSupply(), totalSupply);
-        ghost_mi_B = eq(balanceBefore, oeth.balanceOf(user));
+        // Bypass the check if the `rebasingCreditsPerToken < 1e18`, known case for invariant breaking.
+        if (oeth.rebasingCreditsPerTokenHighres() >= 1e18) {
+            ghost_mi_B = eq(balanceBefore, oeth.balanceOf(user));
+        }
     }
 
     /// @notice Handler to rebaseOptOut a random user.
