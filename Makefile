@@ -12,7 +12,7 @@ install:
 	forge soldeer install
 
 clean:
-	@rm -rf broadcast cache out
+	@rm -rf broadcast cache out crytic-export test/invariants/multi-fuzzer/out
 
 clean-all:
 	@rm -rf broadcast cache out dependencies node_modules soldeer.lock
