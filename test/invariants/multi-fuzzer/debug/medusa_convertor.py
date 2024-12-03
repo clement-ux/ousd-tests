@@ -1,7 +1,7 @@
 import json
 
 # Load the JSON file
-json_file = 'test/invariants/multi-fuzzer/out/medusa/call_sequences/1733221892688394000-a39681a7-0e3e-4de7-bee2-818a6980cfcd.json'
+json_file = 'test/invariants/multi-fuzzer/out/medusa/test_results/1733242239651098000-27e36edc-b821-43ca-8def-dae371606a00.json'
 with open(json_file, 'r') as file:
     data = json.load(file)
 
