@@ -121,7 +121,7 @@ abstract contract TargetFunctions is Properties {
         );
 
         // Update ghost
-        ghost_mi_F = approxEqAbs(balanceOf, oeth.balanceOf(user) + _amount, 0);
+        ghost_mi_F = eq(balanceOf, oeth.balanceOf(user) + _amount);
     }
 
     /// @notice Handler to change the totalSupply of OETH.
