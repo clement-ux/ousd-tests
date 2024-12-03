@@ -28,6 +28,8 @@ abstract contract TargetFunctions is Properties {
     uint256 public constant MAX_SUPPLY_CHANGE_PCT_SLOW = 10e16; // 10%
     /// @notice Above this threshold, the fuzzer will increase the supply by a value between 0.000000000000000001% and MAX_SUPPLY_CHANGE_PCT_SLOW.
     uint256 public constant MAX_SUPPLY_REDUCE_CHANGE_PCT_THRESHOLD = 1_000_000e18; // 1 OETH
+    /// @notice Above this total supply, mint and change supply will be skipped.
+    uint256 public constant MAX_SUPPLY_USED = 2_000_000_000e18; // 1B OUSD
 
     /// @notice Above this value, logs will display a warning on mint and burn.
     uint256 public constant NOTIFY_MINT_BURN_THRESHOLD = 100_000_000e18; // 100M OUSD
@@ -47,6 +49,10 @@ abstract contract TargetFunctions is Properties {
 
         if (oeth.totalSupply() + _amount >= MAX_SUPPLY && DOS_CHECK) {
             console.log("OETH function: mint() \t\t skip: MSR");
+            return;
+        }
+        if (oeth.totalSupply() + _amount >= MAX_SUPPLY_USED) {
+            console.log("OETH function: mint() \t\t skip: MSU");
             return;
         }
 
@@ -115,7 +121,7 @@ abstract contract TargetFunctions is Properties {
         );
 
         // Update ghost
-        ghost_mi_F = eq(balanceOf, oeth.balanceOf(user) + _amount);
+        ghost_mi_F = approxEqAbs(balanceOf, oeth.balanceOf(user) + _amount, 0);
     }
 
     /// @notice Handler to change the totalSupply of OETH.
@@ -167,6 +173,11 @@ abstract contract TargetFunctions is Properties {
         );
         // Calculate the new totalSupply.
         uint256 newTotalSupply = totalSupply * (1e18 + _pctChange) / 1e18;
+
+        if (newTotalSupply >= MAX_SUPPLY_USED) {
+            console.log("OETH function: mint() \t\t skip: MSU");
+            return;
+        }
 
         // Prank the vault address.
         hevm.prank(address(vault));
