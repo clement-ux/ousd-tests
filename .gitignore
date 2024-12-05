@@ -16,6 +16,7 @@ docs/
 # Fuzzed files
 crytic-export/
 coverage-echidna/
+.certora_internal/
 
 # Soldeer
 /dependencies
