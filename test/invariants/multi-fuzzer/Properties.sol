@@ -45,7 +45,7 @@ abstract contract Properties is Setup, StdUtils, Utils {
     // Invariant C: When transfer(from, to, amount), balanceBefore(to) + amount == balanceAfter(to) (checked in handlers)
     // Invariant D: ∀ user, ∑balanceOf(user) <= totalSupply
     // Invariant E: ∀ user ∈ [rebaseState == StdNonRebasing], ∑balanceOf(user) == nonRebasingSupply
-    // Invariant F: ∀ user ∈ [rebaseState == NotSet || StdRebasing || YieldDelegationTarget], ∑creditBalances(user) == rebasingCredits (± 1e12)
+    // Invariant F: ∀ user ∈ [rebaseState == NotSet || StdRebasing || YieldDelegationTarget], ∑creditBalances(user) == rebasingCredits
     // Invariant G: ∀ user, balanceOf(user) == _creditBalances[account] * 1e18 / (alternativeCreditsPerToken[account] > 0 ? alternativeCreditsPerToken[account] : _rebasingCreditsPerToken) - (yieldFrom[account] == 0 ? 0 : _creditBalances[yieldFrom[account]])
 
     // --- Rebasing invariants ---
