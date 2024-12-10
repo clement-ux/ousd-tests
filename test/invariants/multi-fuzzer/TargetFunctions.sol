@@ -72,10 +72,7 @@ abstract contract TargetFunctions is Properties {
         );
 
         // Update ghost
-        // Bypass the check if the `rebasingCreditsPerToken < 1e18`, known case for invariant breaking.
-        if (oeth.rebasingCreditsPerTokenHighres() >= 1e18) {
-            ghost_mi_E = eq(balanceBefore + _amount, oeth.balanceOf(user));
-        }
+        ghost_mi_E = eq(balanceBefore + _amount, oeth.balanceOf(user));
     }
 
     /// @notice Handler to burn a random amount of OETH from a random user.
@@ -124,10 +121,7 @@ abstract contract TargetFunctions is Properties {
         );
 
         // Update ghost
-        // Bypass the check if the `rebasingCreditsPerToken < 1e18`, known case for invariant breaking.
-        if (oeth.rebasingCreditsPerTokenHighres() >= 1e18) {
-            ghost_mi_F = eq(balanceOf, oeth.balanceOf(user) + _amount);
-        }
+        ghost_mi_F = eq(balanceOf, oeth.balanceOf(user) + _amount);
     }
 
     /// @notice Handler to change the totalSupply of OETH.
@@ -182,6 +176,15 @@ abstract contract TargetFunctions is Properties {
 
         if (newTotalSupply >= MAX_SUPPLY_USED) {
             console.log("OETH function: mint() \t\t skip: MSU");
+            return;
+        }
+
+        uint256 _newTotalSupply = min(newTotalSupply, MAX_SUPPLY);
+        uint256 _rebasingSupply = _newTotalSupply - oeth.nonRebasingSupply();
+        uint256 _rebasingCreditsPerToken =
+            (oeth.rebasingCreditsHighres() - 1e18 + _rebasingSupply - 1) / _rebasingSupply;
+        if (_rebasingCreditsPerToken < 1e18) {
+            console.log("OETH function: changeSupply() \t skip: rcpt < 1e18");
             return;
         }
 
@@ -251,19 +254,16 @@ abstract contract TargetFunctions is Properties {
 
         // Update ghost
         ghost_bi_A = eq(oeth.totalSupply(), totalSupply);
-        // Bypass the check if the `rebasingCreditsPerToken < 1e18`, known case for invariant breaking.
-        if (oeth.rebasingCreditsPerTokenHighres() >= 1e18) {
-            if (from != to) {
-                ghost_bi_B = eq(balanceOfBeforeFrom, oeth.balanceOf(from) + _amount);
-                ghost_bi_C = eq(balanceOfBeforeTo + _amount, oeth.balanceOf(to));
-            } else {
-                ghost_bi_B = eq(balanceOfBeforeFrom, oeth.balanceOf(from));
-            }
+        if (from != to) {
+            ghost_bi_B = eq(balanceOfBeforeFrom, oeth.balanceOf(from) + _amount);
+            ghost_bi_C = eq(balanceOfBeforeTo + _amount, oeth.balanceOf(to));
+        } else {
+            ghost_bi_B = eq(balanceOfBeforeFrom, oeth.balanceOf(from));
+        }
 
-            for (uint256 i = 0; i < users.length; i++) {
-                if (users[i] != from && users[i] != to) {
-                    ghost_mi_G = eq(balances[i], oeth.balanceOf(users[i]));
-                }
+        for (uint256 i = 0; i < users.length; i++) {
+            if (users[i] != from && users[i] != to) {
+                ghost_mi_G = eq(balances[i], oeth.balanceOf(users[i]));
             }
         }
     }
@@ -308,10 +308,7 @@ abstract contract TargetFunctions is Properties {
 
         // Update ghost
         ghost_bi_A = eq(oeth.totalSupply(), totalSupply);
-        // Bypass the check if the `rebasingCreditsPerToken < 1e18`, known case for invariant breaking.
-        if (oeth.rebasingCreditsPerTokenHighres() >= 1e18) {
-            ghost_mi_B = eq(balanceBefore, oeth.balanceOf(user));
-        }
+        ghost_mi_B = eq(balanceBefore, oeth.balanceOf(user));
     }
 
     /// @notice Handler to rebaseOptOut a random user.

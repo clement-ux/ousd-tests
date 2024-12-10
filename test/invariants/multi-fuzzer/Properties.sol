@@ -199,8 +199,6 @@ abstract contract Properties is Setup, StdUtils, Utils {
             }
         }
 
-        // Bypass the check if the `rebasingCreditsPerToken < 1e18`, known case for invariant breaking.
-        if (oeth.rebasingCreditsPerTokenHighres() < 1e18) return true;
         return eq(oeth.nonRebasingSupply(), sum);
     }
 
@@ -223,7 +221,7 @@ abstract contract Properties is Setup, StdUtils, Utils {
         (uint256 creditBalance,,) = oeth.creditsBalanceOfHighres(dead);
         sum += creditBalance;
 
-        return approxEqAbs(sum, oeth.rebasingCreditsHighres(), 1e12);
+        return eq(sum, oeth.rebasingCreditsHighres());
     }
 
     function property_balance_G() public view returns (bool) {
