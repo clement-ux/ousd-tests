@@ -6,19 +6,19 @@ libs = ["dependencies"]
 auto_detect_remappings = false
 verbosity = 3
 show_progress = true
-ignored_warnings_from = [
-    "dependencies/origin-dollar-1/contracts/contracts/proxies/",
-]
+ignored_warnings_from = ["dependencies/"]
 
 [invariant]
 runs = 256
 depth = 500
-fail_on_revert = true
+shrink_run_limit = 50_000
+show_metrics = true
+fail_on_revert = false
 
 [dependencies]
 forge-std = "1.9.4"
-origin-dollar = { version = "1", git = "https://github.com/OriginProtocol/origin-dollar.git", rev = "dc7970116395447ae2b7f59be9bd57d060bad18a" } # master
-origin-dollar-yd = { version = "1", git = "https://github.com/OriginProtocol/origin-dollar.git", rev = "53db807bfa802e7826d40ec55efdee964945829b" } # rebaseElsewhere_v2
+origin-dollar = { version = "1", git = "https://github.com/OriginProtocol/origin-dollar.git", rev = "dc7970116395447ae2b7f59be9bd57d060bad18a" }    # master
+origin-dollar-yd = { version = "1", git = "https://github.com/OriginProtocol/origin-dollar.git", rev = "5e57112a9db3bed51d5ef725a589ca89f576df45" } # rebaseElsewhere_v2
 "@openzeppelin-contracts" = "4.2"
 
 [soldeer]

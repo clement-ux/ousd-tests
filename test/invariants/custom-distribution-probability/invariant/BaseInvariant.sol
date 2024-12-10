@@ -2,7 +2,7 @@
 pragma solidity 0.8.27;
 
 // Test imports
-import {Shared_Test_} from "test/Shared.sol";
+import {Shared_Test_} from "../Shared.sol";
 
 // Contract
 import {OUSD} from "origin/token/OUSD.sol";
@@ -43,7 +43,7 @@ abstract contract Invariant_Base_Test_ is Shared_Test_ {
     // Invariant E: _rebasingCredits  == ∑user _creditBalances, ∀ rebasedOptIn  user
     // Invariant F: _rebasingCreditsPerToken <= 1e27
     // Invariant G: ∀ rebasedOptIn  user, nonRebasingCreditsPerToken == 0
-    // Invariant G: ∀ rebasedOptOut user, nonRebasingCreditsPerToken >= _rebasingCreditsPerToken 
+    // Invariant G: ∀ rebasedOptOut user, nonRebasingCreditsPerToken >= _rebasingCreditsPerToken
     // Invariant H: ∀ user rebasedOptIn, balanceOf == _creditBalances / _rebasingCreditsPerToken // note: useless like this, need to change
     // Invariant H: ∀ user rebasedOptOut, balanceOf == _creditBalances / nonRebasingCreditsPerToken[_account] // note: useless like this, need to change
     // Invariant I: ∀ user rebasedOptIn, rebaseState == RebaseState.OPT_IN

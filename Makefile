@@ -12,7 +12,7 @@ install:
 	forge soldeer install
 
 clean:
-	@rm -rf broadcast cache out
+	@rm -rf broadcast cache out crytic-export test/invariants/multi-fuzzer/out
 
 clean-all:
 	@rm -rf broadcast cache out dependencies node_modules soldeer.lock
@@ -39,6 +39,12 @@ test-c-%:
 
 test-all:
 	@make test-std
+
+# Invariant
+invariants:
+	make test-c-FuzzerFoundry
+	echidna . --contract FuzzerEchidna --config echidna.yaml
+	medusa fuzz
 
 # Coverage
 coverage:

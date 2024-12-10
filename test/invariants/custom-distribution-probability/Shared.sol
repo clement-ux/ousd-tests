@@ -2,7 +2,7 @@
 pragma solidity 0.8.27;
 
 // Test imports
-import {Base_Test_} from "test/Base.sol";
+import {Base_Test_} from "./Base.sol";
 
 // Contracts
 import {OETH} from "origin/token/OETH.sol";
@@ -77,9 +77,7 @@ abstract contract Shared_Test_ is Base_Test_ {
         oeth = new OETH();
 
         // 3. Initialize proxy.
-        bytes memory data = abi.encodeWithSignature(
-            "initialize(address,uint256)", address(vault), 1e27
-        );
+        bytes memory data = abi.encodeWithSignature("initialize(address,uint256)", address(vault), 1e27);
 
         oethProxy.initialize(address(oeth), governor, data);
 
