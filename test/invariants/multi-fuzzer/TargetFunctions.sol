@@ -182,7 +182,7 @@ abstract contract TargetFunctions is Properties {
         uint256 _newTotalSupply = min(newTotalSupply, MAX_SUPPLY);
         uint256 _rebasingSupply = _newTotalSupply - oeth.nonRebasingSupply();
         uint256 _rebasingCreditsPerToken =
-            (oeth.rebasingCreditsHighres() - 1e18 + _rebasingSupply - 1) / _rebasingSupply;
+            (oeth.rebasingCreditsHighres() * 1e18 + _rebasingSupply - 1) / _rebasingSupply;
         if (_rebasingCreditsPerToken < 1e18) {
             console.log("OETH function: changeSupply() \t skip: rcpt < 1e18");
             return;
